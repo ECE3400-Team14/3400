@@ -9,23 +9,23 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  forwardOneGrid();
+  forwardOneBlcok();
   right90();
-  forwardOneGrid();
+  forwardOneBlcok();
   left90();
-  forwardOneGrid();
+  forwardOneBlcok();
   left90();
-  forwardOneGrid();
+  forwardOneBlcok();
   left90();
-  forwardOneGrid();
+  forwardOneBlcok();
   left90();
-  forwardOneGrid();
+  forwardOneBlcok();
   right90();
-  forwardOneGrid();
+  forwardOneBlcok();
   right90();
-  forwardOneGrid();
+  forwardOneBlcok();
 }
-void forwardOneGrid(){
+void forwardOneBlcok(){
   forward();
   delay(1700);
   stopMovement();
