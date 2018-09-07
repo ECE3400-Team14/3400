@@ -2,13 +2,11 @@
 Servo left;
 Servo right;
 void setup() {
-  // put your setup code here, to run once:
   left.attach(3);
   right.attach(5);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   forwardOneBlcok();
   right90();
   forwardOneBlcok();
