@@ -26,7 +26,6 @@ void forwardAndLeft(){
   left.write(0);
   right.write(0);
   while (readLeftSensor() == 0 && readRightSensor() == 0);
-  //while (readRightmostSensor() == 0 || readLeftmostSensor() == 0 || readRightSensor() == 0 || readLeftSensor() == 0);
   while (readLeftSensor() == 1 || readRightSensor() == 1);
   stopMovement();
 }
@@ -37,7 +36,6 @@ void forwardAndRight(){
   left.write(180);
   right.write(180);
   while (readLeftSensor() == 0 && readRightSensor() == 0);
-  //while (readRightmostSensor() == 0 || readLeftmostSensor() == 0 || readRightSensor() == 0 || readLeftSensor() == 0);
   while (readLeftSensor() == 1 || readRightSensor() == 1);
   stopMovement();
 }
