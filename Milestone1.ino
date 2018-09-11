@@ -20,27 +20,29 @@ void loop() {
   forwardAndLeft();
 }
 void forwardAndLeft(){
-  while (ReadLeftmostSensor() == 1 || readRightmostSensor() == 1){
+  while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
     trackLine();
   }
   left.write(0);
-  right.write(90);
-  while (readRightmostSensor() == 0 || readLeftmostSensor() == 0 || readRightSensor() == 0 || readLeftSensor() == 0);
+  right.write(0);
+  while (readLeftSensor() == 0 && readRightSensor() == 0);
+  //while (readRightmostSensor() == 0 || readLeftmostSensor() == 0 || readRightSensor() == 0 || readLeftSensor() == 0);
   while (readLeftSensor() == 1 || readRightSensor() == 1);
   stopMovement();
 }
 void forwardAndRight(){
-   while (ReadLeftmostSensor() == 1 || readRightmostSensor() == 1){
+  while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
     trackLine();
   }
-  left.write(90);
+  left.write(180);
   right.write(180);
-  while (readRightmostSensor() == 0 || readLeftmostSensor() == 0 || readRightSensor() == 0 || readLeftSensor() == 0);
+  while (readLeftSensor() == 0 && readRightSensor() == 0);
+  //while (readRightmostSensor() == 0 || readLeftmostSensor() == 0 || readRightSensor() == 0 || readLeftSensor() == 0);
   while (readLeftSensor() == 1 || readRightSensor() == 1);
   stopMovement();
 }
 void forwardAndStop(){
-  while (ReadLeftmostSensor() == 1 || readRightmostSensor() == 1){
+  while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
     trackLine();
   }
   stopMovement();
@@ -82,21 +84,6 @@ int readRightmostSensor(){
   Serial.print(val);
   Serial.print("\n");
   return val > 650? 1:0;
-  }
-void forwardOneBlock(){
-  forward();
-  delay(1700);
-  stopMovement();
-  }
-void left90(){
-  turnLeft();
-  delay(670);
-  stopMovement();
-  }
-void right90(){
-  turnRight();
-  delay(670);
-  stopMovement();
   }
 void backward(){
   left.write(180);
