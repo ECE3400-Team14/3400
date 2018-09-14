@@ -1,12 +1,14 @@
 #include <Servo.h>
 Servo left;
 Servo right;
+int buttonPin = 8;
 void setup() {
-  left.attach(3);
-  right.attach(5);
-  left.write(90);
-  right.write(90);
+  left.attach(5);
+  right.attach(3);
+  stopMovement();
   Serial.begin(9600);
+  pinMode(buttonPin, INPUT);
+  while (digitalRead(buttonPin) == LOW);
 }
 
 void loop() {
@@ -23,8 +25,7 @@ void forwardAndLeft(){
   while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
     trackLine();
   }
-  left.write(0);
-  right.write(0);
+  turnLeft();
   while (readLeftSensor() == 0 && readRightSensor() == 0);
   while (readLeftSensor() == 1 || readRightSensor() == 1);
   stopMovement();
@@ -33,8 +34,7 @@ void forwardAndRight(){
   while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
     trackLine();
   }
-  left.write(180);
-  right.write(180);
+  turnRight();
   while (readLeftSensor() == 0 && readRightSensor() == 0);
   while (readLeftSensor() == 1 || readRightSensor() == 1);
   stopMovement();
@@ -49,12 +49,12 @@ void trackLine(){
     if (readLeftSensor() == 0 && readRightSensor() == 0)
       forward();
     else if (readLeftSensor() == 0 && readRightSensor() == 1){
-      left.write(0);
-      right.write(90);
+      writeRight(180);
+      writeLeft(90);
     }
     else if (readLeftSensor() == 1 && readRightSensor() == 0){
-      left.write(90);
-      right.write(180);
+      writeLeft(180);
+      writeRight(90);
     }else
       backward();
   }
@@ -63,43 +63,51 @@ int readLeftSensor(){
   int val = analogRead(0);
   Serial.print(val);
   Serial.print(" ");
-  return val > 650? 1:0;
+  return val > 800? 1:0;
   }
 int readRightSensor(){
   int val = analogRead(1);
   Serial.print(val);
   Serial.print(" ");
-  return val > 650? 1:0;
+  return val > 800? 1:0;
   }
 int readLeftmostSensor(){
   int val = analogRead(2);
   Serial.print(val);
   Serial.print(" ");
-  return val > 650? 1:0;
+  return val > 600? 1:0;
   }
 int readRightmostSensor(){
   int val = analogRead(3);
   Serial.print(val);
   Serial.print("\n");
-  return val > 650? 1:0;
+  return val > 600? 1:0;
   }
+/* writing 180 to both functions would go forward, 0 would go backward*/
+void writeLeft(int speed){
+    left.write(speed);
+  }
+void writeRight(int speed){
+    right.write(180-speed);
+  }
+
 void backward(){
-  left.write(180);
-  right.write(0);
+  writeLeft(0);
+  writeRight(0);
   }
 void forward(){
-  left.write(0);
-  right.write(180);
+  writeLeft(180);
+  writeRight(180);
   }
 void turnLeft(){
-  left.write(0);
-  right.write(0);
+  writeLeft(0);
+  writeRight(180);
   }
 void turnRight(){
-  left.write(180);
-  right.write(180);
+  writeLeft(180);
+  writeRight(0);
   }
 void stopMovement(){
-  left.write(90);
-  right.write(90);
+  writeLeft(90);
+  writeRight(90);
   }
