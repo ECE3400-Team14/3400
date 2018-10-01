@@ -79,6 +79,7 @@ void loop() {
     else {
       if (!IR_initilized){
         ADCSRA = 0xe4; // set the adc to free running mode
+        IR_initilized = 1;
       }else{
         if (fft_log_out[21] > 60){
           Serial.println("Robot Detected!!!");
