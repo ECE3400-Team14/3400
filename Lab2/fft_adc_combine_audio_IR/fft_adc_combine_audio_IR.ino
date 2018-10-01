@@ -15,7 +15,7 @@ port at 115.2kb.
 #include <FFT.h> // include the library
 
 bool has_started = false;//false: Audio Analysis Stage, true: IR Analysis Stage
-bool IR_initilized = false;
+//bool IR_initilized = false;
 //Audio FFT Variables
 int threshold = 70;//the monitored signal bin amplitude threshold for detection
 int start_count = 0;// counter for keeping track of back-to-back detections
@@ -77,14 +77,9 @@ void loop() {
       else { start_count = (start_count != 0) ? start_count - 1 : 0;}
     }
     else {
-      if (!IR_initilized){
-        ADCSRA = 0xe4; // set the adc to free running mode
-        IR_initilized = 1;
-      }else{
         if (fft_log_out[21] > 60){
           Serial.println("Robot Detected!!!");
         }
-      }
     }
     /*
     Serial.println("start");
