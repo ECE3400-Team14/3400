@@ -61,7 +61,9 @@ void loop() {
     fft_run(); // process the data in the fft
     fft_mag_log(); // take the output of the fft
     sei();
+    //660 hz Audio Analysis
     if(!has_started) {
+      Serial.println(fft_log_out[17]);
       if(fft_log_out[17] > threshold) {
         Serial.println("660Hz detected!");
         Serial.println(fft_log_out[17]);
@@ -69,6 +71,7 @@ void loop() {
         if(start_count == 5) {
           Serial.println("Go!!!!!!");
           Serial.println("Disabling Audio Detection");
+          Serial.println("Enabling IR Detection");
           has_started = true;//start the Robot and IR analysis
           digitalWrite(mux_pin, HIGH);//Set mux to IR input
           start_count = 0;
@@ -76,9 +79,13 @@ void loop() {
       }
       else { start_count = (start_count != 0) ? start_count - 1 : 0;}
     }
+    //IR Analysis
     else {
         if (fft_log_out[21] > 60){
           Serial.println("Robot Detected!!!");
+        }
+        else{
+          Serial.println("No Robot Detected");
         }
     }
     /*
