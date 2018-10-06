@@ -8,29 +8,27 @@ port at 115.2kb.
 */
 
 #define LOG_OUT 1 // use the log output function
-//#define OCTAVE 1 // use the oct output function
-//#define OCT_NORM 1
 #define FFT_N 256 // set to 256 point fft
 
 #include <FFT.h> // include the library
 
 bool has_started = false;//false: Audio Analysis Stage, true: IR Analysis Stage
-//bool IR_initilized = false;
+bool IR_initilized = false;
 //Audio FFT Variables
-int threshold = 70;//the monitored signal bin amplitude threshold for detection
+int threshold = 140;//the monitored signal bin amplitude threshold for detection
 int start_count = 0;// counter for keeping track of back-to-back detections
 int count_max = 5;// the number of back-to-back detections for a confirmed detection
 
 //TODO: add any IR local variables here
 
-int mux_pin = 0; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
+int mux_pin = 2; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
 
 void setup() {
   Serial.begin(9600); // use the serial port
-  
+  Serial.println("Waiting for 660 Hz");
   TIMSK0 = 0; // turn off timer0 for lower jitter
   ADCSRA = 0xe7; // set the adc to free running mode (change to 0xe7 for default resolution?)
-  ADMUX = 0x41; // use adc0
+  ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
 
   pinMode(mux_pin, OUTPUT);
@@ -63,10 +61,10 @@ void loop() {
     sei();
     //660 hz Audio Analysis
     if(!has_started) {
-      Serial.println(fft_log_out[17]);
+      //Serial.println(fft_log_out[17]);
       if(fft_log_out[17] > threshold) {
         Serial.println("660Hz detected!");
-        Serial.println(fft_log_out[17]);
+        //Serial.println(fft_log_out[17]);
         start_count++;
         if(start_count == 5) {
           Serial.println("Go!!!!!!");
@@ -81,12 +79,18 @@ void loop() {
     }
     //IR Analysis
     else {
-        if (fft_log_out[21] > 60){
-          Serial.println("Robot Detected!!!");
+      if (IR_initilized == false) {ADCSRA = 0xe4;
+      IR_initilized = true;
+      }
+      else{
+        //Serial.println(fft_log_out[21]);
+        if (fft_log_out[21] > 50  ){
+            Serial.println("Robot Detected!!!");
         }
         else{
-          Serial.println("No Robot Detected");
-        }
+          //Serial.println("No Robot Detected");
+           start_count = (start_count != 0) ? start_count - 1 : 0;
+        }}
     }
     /*
     Serial.println("start");
