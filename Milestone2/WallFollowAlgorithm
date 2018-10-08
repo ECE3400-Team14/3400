@@ -1,9 +1,15 @@
 #include <Servo.h>
 Servo left;
 Servo right;
-int buttonPin = 8;
-int rightWallSensor = 1;
-int frontWallSensor = 2;
+int buttonPin = 7;
+int rightWallSensor = A5;
+int rightWallLED = 6;
+int frontWallSensor = A4;
+int frontWallLED = 10;
+int mux0=8;
+int mux1=9;
+int muxRead = A2;
+int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
 void setup() {
   left.attach(5);
   right.attach(3);
@@ -12,10 +18,30 @@ void setup() {
   pinMode(buttonPin, INPUT);
    pinMode(rightWallSensor, INPUT);
   pinMode(frontWallSensor, INPUT);
-  while (digitalRead(buttonPin) == LOW);
+  pinMode(rightWallLED, OUTPUT);
+  pinMode(frontWallLED, OUTPUT);
+  pinMode(mux0, OUTPUT);
+  pinMode(mux1, OUTPUT);
+  while(digitalRead(buttonPin)==LOW);
 }
 
 void loop() {
+//  forwardAndLeft();
+//  
+//  forwardAndRight();
+//
+//  forwardAndRight();
+// 
+//  forwardAndRight();
+// 
+//  forwardAndRight();
+//  
+//  forwardAndLeft();
+// 
+//  forwardAndLeft();
+//  
+//  forwardAndLeft();
+// 
    int hasRightWall = readRightWallSensor();
    int hasFrontWall = readForwardWallSensor();
    if (hasRightWall==1&&hasFrontWall==0) {
@@ -24,25 +50,61 @@ void loop() {
    else if (hasRightWall==1&&hasFrontWall==1){
     turnLeft();
     finishTurn();
-    forwardAndStop();
    }
    else if (hasRightWall==0){
     turnRight();
     finishTurn();
     forwardAndStop();
    }
+// troubleshooting code block:
+//   int leftmost = readLeftmostSensor();
+//   int left = readLeftSensor();
+//   int right = readRightSensor();
+//   int rightmost = readRightmostSensor();
+//   Serial.print("|");
+//   int hasRightWall = readRightWallSensor(); 
+//   int hasFrontWall = readForwardWallSensor();
+//   Serial.print(hasRightWall);
+//   Serial.print(" ");
+//   Serial.print(hasFrontWall);
+//   Serial.println();
 }
 
 void finishTurn(){
-  while (readLeftSensor() == 0 && readRightSensor() == 0);//robot exits line (both line sensors dark)
+  while (readLeftSensor() == 0 || readRightSensor() == 0);//robot exits line (breaks loop when both sensors are dark)
   while (readLeftSensor() == 1 || readRightSensor() == 1);//robot enters line again (both line sensors light)
   stopMovement();
+}
+void forwardUntilOffIntersection(){
+  while (readLeftmostSensor() == 0 && readRightmostSensor() == 0){
+    trackLine();
+  }
 }
 
 void forwardAndStop(){
   while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
     trackLine();
   }
+  stopMovement();
+}
+
+void forwardAndLeft(){
+  while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){ //This statement detects an intersection (both outer sensors go light to break loop)
+    trackLine();
+  }
+  turnLeft();
+  while (readLeftSensor() == 0 && readRightSensor() == 0);//robot exits line (both line sensors dark)
+  while (readLeftSensor() == 1 || readRightSensor() == 1);//robot enters line again (both line sensors light)
+  stopMovement();
+}
+
+void forwardAndRight(){
+  while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
+    trackLine();
+  }
+  turnRight();
+  while (readLeftSensor() == 0 && readRightSensor() == 0);
+  while (readLeftSensor() == 1 || readRightSensor() == 1);
   stopMovement();
 }
 
@@ -64,40 +126,73 @@ void trackLine(){
  * Returns 1 for wall detected and 0 for no wall detected
  */
 int readForwardWallSensor() {
-  return 0;
+  int val = analogRead(frontWallSensor);
+  Serial.print(val);
+  Serial.print(" ");
+  if (val>140){
+    digitalWrite(frontWallLED, HIGH);
+    return 1;
+  }
+  else{
+    digitalWrite(frontWallLED, LOW);
+    return 0;
+  }
 }
 
 /* read right-facing sensor. 
  *  Returns 1 for wall detected and 0 for no wall detected
  */
 int readRightWallSensor() {
-  return 0;
+  
+  int val = analogRead(rightWallSensor);
+  Serial.print(val);
+  Serial.print(" ");
+  if (val>140){
+    digitalWrite(rightWallLED, HIGH);
+    return 1;
+  }
+  else{
+    digitalWrite(rightWallLED, LOW);
+    return 0;
+  }
 }
   
 /* returns 0 if white detected, 1 if black */
 int readLeftSensor(){
-  int val = analogRead(0);
+  digitalWrite(mux0, LOW);
+  digitalWrite(mux1, LOW);
+  delay(muxReadDelay);
+  int val = analogRead(muxRead);
   Serial.print(val);
   Serial.print(" ");
-  return val > 450? 1:0;
+  return val > 357? 1:0;
   }
 int readRightSensor(){
-  int val = analogRead(1);
+  digitalWrite(mux0, HIGH);
+  digitalWrite(mux1, LOW);
+  delay(muxReadDelay);
+  int val = analogRead(muxRead);
   Serial.print(val);
   Serial.print(" ");
-  return val > 420? 1:0;
+  return val > 297? 1:0;
   }
 int readLeftmostSensor(){
-  int val = analogRead(2);
+  digitalWrite(mux0, HIGH);
+  digitalWrite(mux1, HIGH);
+  delay(muxReadDelay);
+  int val = analogRead(muxRead);
   Serial.print(val);
   Serial.print(" ");
-  return val > 670? 1:0;
+  return val > 630? 1:0;
   }
 int readRightmostSensor(){
-  int val = analogRead(3);
+  digitalWrite(mux0, LOW);
+  digitalWrite(mux1, HIGH);
+  delay(muxReadDelay);
+  int val = analogRead(muxRead);
   Serial.print(val);
-  Serial.print("\n");
-  return val > 680? 1:0;
+//  Serial.print("\n");
+  return val > 570? 1:0;
   }
 /* writing 180 to both functions would go forward, 0 would go backward*/
 void writeLeft(int speed){
