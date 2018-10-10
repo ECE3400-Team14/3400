@@ -23,6 +23,8 @@ void setup() {
   pinMode(mux0, OUTPUT);
   pinMode(mux1, OUTPUT);
   while(digitalRead(buttonPin)==LOW);
+
+  fft_setup();//ADDED
 }
 
 void loop() {
@@ -50,6 +52,7 @@ void loop() {
    else if (hasRightWall==1&&hasFrontWall==1){
     turnLeft();
     finishTurn();
+    forwardAndStop();
    }
    else if (hasRightWall==0){
     turnRight();
@@ -75,16 +78,25 @@ void finishTurn(){
   while (readLeftSensor() == 1 || readRightSensor() == 1);//robot enters line again (both line sensors light)
   stopMovement();
 }
-void forwardUntilOffIntersection(){
+void forwardUntilOffIntersection() {
   while (readLeftmostSensor() == 0 && readRightmostSensor() == 0){
     trackLine();
   }
 }
 
 void forwardAndStop(){
-  while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
-    trackLine();
-  }
+    int i = 0;
+    while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
+      trackLine();
+      //perform FFT every __ number of cycles
+      if (i == 50) {
+        while (fft_analyze()){
+          stopMovement();
+        } //Added
+        i = 0;
+      }
+      else { i++; }
+    }
   stopMovement();
 }
 
