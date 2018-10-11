@@ -4,7 +4,7 @@ Based off example sketch fft_adc_serial provided by the FFT library
 */
 
 #define LOG_OUT 1 // use the log output function
-#define FFT_N 256 // set to 256 point fft
+#define FFT_N 128 // set to 256 point fft
 
 #include <FFT.h> // include the library
 
@@ -17,12 +17,12 @@ int count_max = 5;// the number of back-to-back detections for a confirmed detec
 
 int mux_pin = 2; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
 
+int OLD_ADCSRA;
+
 //The setup FFT function
 void fft_setup() {
-  Serial.begin(9600); // use the serial port
-  Serial.println("Waiting for 660 Hz");
-  TIMSK0 = 0; // turn off timer0 for lower jitter
-  ADCSRA = 0xe7; // set the adc to free running mode (change to 0xe7 for default resolution?)
+  //TIMSK0 = 0; // turn off timer0 for lower jitter
+  //ADCSRA = 0xe7; // set the adc to free running mode (change to 0xe7 for default resolution?)
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
 
@@ -32,14 +32,18 @@ void fft_setup() {
 
 //Performs a full FFT analysis. ~ 256 samples/sample rate (~26 ms Audio, ~3 ms IR) 
 //return true for valid detection. false for no detection
-bool fft_analyze() {
-  while(1) { // reduces jitter
+void fft_analyze() {
+    fft_setup();
+    OLD_ADCSRA = ADCSRA;
     cli();  // UDRE interrupt slows this way down on arduino1.0
-    for (int i = 0 ; i < 512 ; i += 2) { // save 256 samples
+    for (int i = 0 ; i < 256 ; i += 2) { // save 256 samples
       while(!(ADCSRA & 0x10)); // wait for adc to be ready
       
       if (!has_started) ADCSRA = 0xf7; // restart adc for audio (128 prescale factor) [9600 Hz sample rate]
-      else  ADCSRA = 0xf4; //IR prescale factor (16) [~76900 Sample Rate]
+      else  {
+        ADCSRA = 0xe4;
+        ADCSRA = 0xf4; //IR prescale factor (16) [~76900 Sample Rate]
+      }
       
       byte m = ADCL; // fetch adc data
       byte j = ADCH;
@@ -70,34 +74,40 @@ bool fft_analyze() {
           has_started = true;//start the Robot and IR analysis
           digitalWrite(mux_pin, HIGH);//Set mux to IR input
           start_count = 0;
-          return true;
+          fft_detect = true;
        }
+        else  fft_detect = false;
       }
-      else { start_count = (start_count != 0) ? start_count - 1 : 0;}
+      else { 
+       start_count = (start_count != 0) ? start_count - 1 : 0;
+       fft_detect = false;
+       }
     }
     //IR Analysis
     else {
-      if (IR_initilized == false) {ADCSRA = 0xe4;
+      if (IR_initilized == false) {//ADCSRA = 0xe4;
       IR_initilized = true;
       }
       else{
         //Serial.println(fft_log_out[21]);
-        if (fft_log_out[21] > 50  ){
+        if (fft_log_out[11] > 55  ){
             Serial.println("Robot Detected!!!");
-            return true;
+            fft_detect = true;
         }
         else{
-          //Serial.println("No Robot Detected");
+           Serial.println("No Robot Detected");
            start_count = (start_count != 0) ? start_count - 1 : 0;
-        }
+           fft_detect = false;
+        } 
       }
     }
-    return false;
+   
+    ADCSRA = OLD_ADCSRA;
     /*
     Serial.println("start");
     for (byte i = 0 ; i < FFT_N/2 ; i++) { 
       Serial.println(fft_log_out[i]); // send out the data
     }*/
     
-  }
+  
 }
