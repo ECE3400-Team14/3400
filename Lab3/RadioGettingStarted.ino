@@ -169,9 +169,9 @@ void loop(void)
     bool ok = radio.write( &data, sizeof(unsigned long) );
 
     if (ok)
-      printf("ok...");
+      Serial.println("ok...");
     else
-      printf("failed.\n\r");
+      Serial.print("failed.\n\r");
 
     // Now, continue listening
     radio.startListening();
@@ -186,7 +186,7 @@ void loop(void)
     // Describe the results
     if ( timeout )
     {
-      printf("Failed, response timed out.\n\r");
+      Serial.print("Failed, response timed out.\n\r");
     }
     else
     {
@@ -229,8 +229,8 @@ void loop(void)
         int color = (data & (1<<12)) >> 12;
         int shape = (data & (3<<13)) >> 13;
         int explored = (data & (1<<15)) >> 15;
-        Serial.print(x);
-        Serial.print(",%d", y);
+        printf("%d",x);
+        printf(",%d", y);
         if (n) Serial.print(",north=true");
         if (e) Serial.print(",east=true");
         if (s) Serial.print(",south=true");
