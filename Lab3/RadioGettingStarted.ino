@@ -229,7 +229,25 @@ void loop(void)
         int color = (data & (1<<12)) >> 12;
         int shape = (data & (3<<13)) >> 13;
         int explored = (data & (1<<15)) >> 15;
-        printf("x = %d, y = %d, north = %d, east = %d, south = %d, west = %d, color = %d, shape = %d, explored = %d\n",x,y,n,e,s,w,color,shape,explored);
+        Serial.print(x);
+        Serial.print(",%d", y);
+        if (n) Serial.print(",north=true");
+        if (e) Serial.print(",east=true");
+        if (s) Serial.print(",south=true");
+        if (w) Serial.print(",west=true");
+        if (shape){
+          if (shape == 3){
+            Serial.print(",tshape=triangle");
+          }else if (shape == 2){
+            Serial.print(",tshape=square");
+          }else{
+            Serial.print(",tshape=circle");
+          }
+          if (color) Serial.print(",tcolor=blue");
+          else Serial.print(",tcolor=red");
+        }
+        
+        //printf("x = %d, y = %d, north = %d, east = %d, south = %d, west = %d, color = %d, shape = %d, explored = %d\n",x,y,n,e,s,w,color,shape,explored);
 
         // Delay just a little bit to let the other unit
         // make the transition to receiver
