@@ -199,7 +199,6 @@ void loop(void)
     }
 
     // Try again 1s later
-    data = data << 1;
     delay(1000);
   }
 
