@@ -3,18 +3,21 @@ Servo left;
 Servo right;
 int buttonPin = 7;
 int rightWallSensor = A5;
-int rightWallLED = 6;
+int rightWallLED = 0;//TEMP
 int frontWallSensor = A4;
 int frontWallLED = 8;
 int mux0=2;
-int mux1=3;
+int mux1=4;
 int muxRead = A3;
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
+int fft_cycle = 10;
+int fft_mux_pin = 6;
 
 bool fft_detect = false;
+bool has_started = false;
 void setup() {
   left.attach(5);//left servo pin 5
-  right.attach(4);//right servo pin 4
+  right.attach(3);//right servo pin 4
   stopMovement();
   Serial.begin(9600);
   pinMode(buttonPin, INPUT);
@@ -24,11 +27,22 @@ void setup() {
   pinMode(frontWallLED, OUTPUT);
   pinMode(mux0, OUTPUT);
   pinMode(mux1, OUTPUT);
+  pinMode(fft_mux_pin, OUTPUT);
   Serial.println("Wait for button");
-  while(digitalRead(buttonPin)==LOW);
+  
+  //while(digitalRead(buttonPin)==LOW);
+  analogRead(1);//initialize analog
+  
   //Serial.println("Button Pressed");
   fft_setup();//ADDED
   Serial.println("FFT Setup Complete");
+   digitalWrite(fft_mux_pin, LOW);
+  
+  while(has_started == false) {
+    fft_analyze();
+    Serial.println("Waiting");
+  }
+  digitalWrite(fft_mux_pin, HIGH);
   
 }
 
@@ -102,7 +116,7 @@ void forwardAndStop(){
       //Serial.println("BEGIN");
       trackLine();
       //perform FFT every __ number of cycles
-      if (i == 5) {
+      if (i == fft_cycle) {
         Serial.println("Running fft");
         /*
         stopMovement();

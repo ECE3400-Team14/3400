@@ -8,14 +8,14 @@ Based off example sketch fft_adc_serial provided by the FFT library
 
 #include <FFT.h> // include the library
 
-bool has_started = true;//false: Audio Analysis Stage, true: IR Analysis Stage
+//bool has_started = false;//false: Audio Analysis Stage, true: IR Analysis Stage
 bool IR_initilized = false;
 //Audio FFT Variables
 int threshold = 140;//the monitored signal bin amplitude threshold for detection
 int start_count = 0;// counter for keeping track of back-to-back detections
 int count_max = 5;// the number of back-to-back detections for a confirmed detection
 
-int mux_pin = 2; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
+//int mux_pin = 6; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
 
 int OLD_ADCSRA;
 
@@ -26,8 +26,8 @@ void fft_setup() {
   ADMUX = 0x40; // use adc0
   DIDR0 = 0x01; // turn off the digital input for adc0
 
-  pinMode(mux_pin, OUTPUT);
-  digitalWrite(mux_pin, LOW); 
+  //pinMode(mux_pin, OUTPUT);
+  //digitalWrite(mux_pin, LOW); 
 }
 
 //Performs a full FFT analysis. ~ 256 samples/sample rate (~26 ms Audio, ~3 ms IR) 
@@ -63,7 +63,7 @@ void fft_analyze() {
     //660 hz Audio Analysis
     if(!has_started) {
       //Serial.println(fft_log_out[17]);
-      if(fft_log_out[17] > threshold) {
+      if(fft_log_out[9] > threshold) {
         Serial.println("660Hz detected!");
         //Serial.println(fft_log_out[17]);
         start_count++;
@@ -72,7 +72,7 @@ void fft_analyze() {
           Serial.println("Disabling Audio Detection");
           Serial.println("Enabling IR Detection");
           has_started = true;//start the Robot and IR analysis
-          digitalWrite(mux_pin, HIGH);//Set mux to IR input
+          //digitalWrite(mux_pin, HIGH);//Set mux to IR input
           start_count = 0;
           fft_detect = true;
        }
@@ -85,6 +85,7 @@ void fft_analyze() {
     }
     //IR Analysis
     else {
+      //digitalWrite(mux_pin, HIGH); 
       if (IR_initilized == false) {//ADCSRA = 0xe4;
       IR_initilized = true;
       }
