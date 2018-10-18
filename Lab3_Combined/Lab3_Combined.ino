@@ -1,4 +1,5 @@
 #include <Servo.h>
+#include "printf.h"
 Servo left;
 Servo right;
 int buttonPin = 7;
@@ -10,15 +11,19 @@ int mux0=2;
 int mux1=3;
 int muxRead = A3;
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
-
 bool fft_detect = false;
+
+int orientation = 0; //0=north, 1=east, 2=south, 3=west
+int x = 0;
+int y = 0;
+
 void setup() {
   left.attach(5);//left servo pin 5
   right.attach(4);//right servo pin 4
   stopMovement();
   Serial.begin(9600);
   pinMode(buttonPin, INPUT);
-   pinMode(rightWallSensor, INPUT);
+  pinMode(rightWallSensor, INPUT);
   pinMode(frontWallSensor, INPUT);
   pinMode(rightWallLED, OUTPUT);
   pinMode(frontWallLED, OUTPUT);
@@ -29,47 +34,32 @@ void setup() {
   //Serial.println("Button Pressed");
   fft_setup();//ADDED
   Serial.println("FFT Setup Complete");
-  
+  initMaze();
+  printf_begin();
+  radioSetup();
 }
 
 void loop() {
-//  forwardAndLeft();
-//  
-//  forwardAndRight();
-//
-//  forwardAndRight();
-// 
-//  forwardAndRight();
-// 
-//  forwardAndRight();
-//  
-//  forwardAndLeft();
-// 
-//  forwardAndLeft();
-//  
-//  forwardAndLeft();
-// 
-Serial.println("Loop");
  
    int hasRightWall = readRightWallSensor();
    int hasFrontWall = readForwardWallSensor();
-    /*
-   while(true) {
-    fft_analyze();
-    Serial.println(fft_detect);
-    
-   }*/
+   updataMaze();
+   sendMaze();
    if (hasRightWall==1&&hasFrontWall==0) {
     forwardAndStop();
+    updateCoor();
    }
    else if (hasRightWall==1&&hasFrontWall==1){
     turnLeft();
     finishTurn();
+    orientation = (orientation-1)%4;
    }
    else if (hasRightWall==0){
     turnRight();
     finishTurn();
+    orientation = (orientation+1)%4;
     forwardAndStop();
+    updateCoor();
    }
 // troubleshooting code block:
 //   int leftmost = readLeftmostSensor();
@@ -84,7 +74,51 @@ Serial.println("Loop");
 //   Serial.print(hasFrontWall);
 //   Serial.println();
 }
-
+void updateCoor(){
+  if (orientation == 0){
+    y += 1;
+  }else if (orientation == 1){
+    x += 1;
+  }else if (orientation == 2){
+    y -= 1;
+  }else{
+    x -= 1;
+  }
+}
+//temporary solution since only 2 wall sensors
+void updataMaze(){
+  turnLeft();
+  finishTurn();
+  orientation = (orientation-1)%4;
+  int hasFrontWall = readForwardWallSensor();
+  int hasRightWall = readRightWallSensor();
+  if (orientation == 0){
+    if (hasFrontWall) setNorthWall(x, y, 1);
+    if (hasRightWall) setEastWall(x, y, 1);
+  }else if (orientation == 1){
+    if (hasFrontWall) setEastWall(x, y, 1);
+    if (hasRightWall) setSouthWall(x, y, 1);
+  }else if (orientation == 2){
+    if (hasFrontWall) setSouthWall(x, y, 1);
+    if (hasRightWall) setWestWall(x, y, 1);
+  }else{
+    if (hasFrontWall) setWestWall(x, y, 1);
+    if (hasRightWall) setNorthWall(x, y, 1);
+  }
+  turnLeft();
+  finishTurn();
+  orientation = (orientation+1)%4;
+  hasRightWall = readRightWallSensor();
+  if (orientation == 0){
+    if (hasRightWall) setEastWall(x, y, 1);
+  }else if (orientation == 1){
+    if (hasRightWall) setSouthWall(x, y, 1);
+  }else if (orientation == 2){
+    if (hasRightWall) setWestWall(x, y, 1);
+  }else{
+    if (hasRightWall) setNorthWall(x, y, 1);
+  }
+}
 void finishTurn(){
   while (readLeftSensor() == 0 || readRightSensor() == 0);//robot exits line (breaks loop when both sensors are dark)
   while (readLeftSensor() == 1 && readRightSensor() == 1);//robot enters line again (both line sensors light)
@@ -256,4 +290,3 @@ void stopMovement(){
   writeLeft(90);
   writeRight(90);
   }
-
