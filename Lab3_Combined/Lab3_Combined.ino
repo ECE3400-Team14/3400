@@ -43,7 +43,7 @@ void loop() {
  
    int hasRightWall = readRightWallSensor();
    int hasFrontWall = readForwardWallSensor();
-   updataMaze();
+   updateMaze();
    sendMaze();
    if (hasRightWall==1&&hasFrontWall==0) {
     forwardAndStop();
@@ -86,7 +86,7 @@ void updateCoor(){
   }
 }
 //temporary solution since only 2 wall sensors
-void updataMaze(){
+void updateMaze(){
   turnLeft();
   finishTurn();
   orientation = (orientation-1)%4;
