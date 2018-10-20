@@ -60,8 +60,8 @@ void loop() {
  
    int hasRightWall = readRightWallSensor();
    int hasFrontWall = readForwardWallSensor();
-   updateMaze();
-   sendMaze();
+   //updateMaze();
+   //sendMaze();
    if (hasRightWall==1&&hasFrontWall==0) {
     forwardAndStop();
     updateCoor();
@@ -80,16 +80,27 @@ void loop() {
    }
 // troubleshooting code block:
 //   int leftmost = readLeftmostSensor();
-//   int left = readLeftSensor();
+//   Serial.print(leftmost);
+//   Serial.print("|");
+//   int left = readLeftSensor ();
+//   Serial.print(left);
+//   Serial.print("|");
 //   int right = readRightSensor();
+//   Serial.print(right);
+//   Serial.print("|");
 //   int rightmost = readRightmostSensor();
+//   Serial.print(rightmost);
 //   Serial.print("|");
 //   int hasRightWall = readRightWallSensor(); 
 //   int hasFrontWall = readForwardWallSensor();
 //   Serial.print(hasRightWall);
 //   Serial.print(" ");
 //   Serial.print(hasFrontWall);
+//   fft_analyze();
+//   Serial.print(fft_detect);
 //   Serial.println();
+   
+   
 }
 void updateCoor(){
   if (orientation == 0){

@@ -11,9 +11,9 @@ Based off example sketch fft_adc_serial provided by the FFT library
 //bool has_started = false;//false: Audio Analysis Stage, true: IR Analysis Stage
 bool IR_initilized = false;
 //Audio FFT Variables
-int threshold = 140;//the monitored signal bin amplitude threshold for detection
+int threshold = 120;//the monitored signal bin amplitude threshold for detection
 int start_count = 0;// counter for keeping track of back-to-back detections
-int count_max = 5;// the number of back-to-back detections for a confirmed detection
+int count_max = 10;// the number of back-to-back detections for a confirmed detection
 
 //int mux_pin = 6; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
 
@@ -67,7 +67,7 @@ void fft_analyze() {
         Serial.println("660Hz detected!");
         //Serial.println(fft_log_out[17]);
         start_count++;
-        if(start_count == 5) {
+        if(start_count == count_max) {
           Serial.println("Go!!!!!!");
           Serial.println("Disabling Audio Detection");
           Serial.println("Enabling IR Detection");
