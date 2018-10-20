@@ -2,9 +2,9 @@
 #include "printf.h"
 Servo left;
 Servo right;
-int buttonPin = 7;
+int buttonPin = 0;
 int rightWallSensor = A5;
-int rightWallLED = 0;//TEMP
+int rightWallLED = 7;//TEMP
 int frontWallSensor = A4;
 int frontWallLED = 8;
 int mux0=2;
@@ -20,6 +20,8 @@ bool has_started = false;
 int orientation = 0; //0=north, 1=east, 2=south, 3=west
 int x = 0;
 int y = 0;
+
+bool debug = false;//enable and disable debug mode
 
 void setup() {
   left.attach(5);//left servo pin 5
@@ -57,7 +59,7 @@ void setup() {
 }
 
 void loop() {
- 
+  if (!debug) {
    int hasRightWall = readRightWallSensor();
    int hasFrontWall = readForwardWallSensor();
    //updateMaze();
@@ -78,29 +80,38 @@ void loop() {
     forwardAndStop();
     updateCoor();
    }
-// troubleshooting code block:
-//   int leftmost = readLeftmostSensor();
-//   Serial.print(leftmost);
-//   Serial.print("|");
-//   int left = readLeftSensor ();
-//   Serial.print(left);
-//   Serial.print("|");
-//   int right = readRightSensor();
-//   Serial.print(right);
-//   Serial.print("|");
-//   int rightmost = readRightmostSensor();
-//   Serial.print(rightmost);
-//   Serial.print("|");
-//   int hasRightWall = readRightWallSensor(); 
-//   int hasFrontWall = readForwardWallSensor();
-//   Serial.print(hasRightWall);
-//   Serial.print(" ");
-//   Serial.print(hasFrontWall);
-//   fft_analyze();
-//   Serial.print(fft_detect);
-//   Serial.println();
-   
-   
+  }
+  //debug
+  else {
+   // troubleshooting code block:
+   int leftmost = readLeftmostSensor();
+   Serial.print("LL:");
+   Serial.print(leftmost);
+   Serial.print("|");
+   int left = readLeftSensor ();
+   Serial.print("L:");
+   Serial.print(left);
+   Serial.print("|");
+   int right = readRightSensor();
+   Serial.print("R:");
+   Serial.print(right);
+   Serial.print("|");
+   int rightmost = readRightmostSensor();
+   Serial.print("RR:");
+   Serial.print(rightmost);
+   Serial.print("|");
+   int hasRightWall = readRightWallSensor(); 
+   int hasFrontWall = readForwardWallSensor();
+   Serial.print("RW:");
+   Serial.print(hasRightWall);
+   Serial.print(" ");
+   Serial.print("FW:");
+   Serial.print(hasFrontWall);
+   //Serial.println();
+   Serial.print(", ");
+   fft_analyze();
+   Serial.println();
+  }
 }
 void updateCoor(){
   if (orientation == 0){
@@ -115,9 +126,9 @@ void updateCoor(){
 }
 //temporary solution since only 2 wall sensors
 void updateMaze(){
-  turnLeft();
-  finishTurn();
-  orientation = (orientation-1)%4;
+//  turnLeft();
+//  finishTurn();
+//  orientation = (orientation-1)%4;
   int hasFrontWall = readForwardWallSensor();
   int hasRightWall = readRightWallSensor();
   if (orientation == 0){
@@ -133,19 +144,19 @@ void updateMaze(){
     if (hasFrontWall) setWestWall(x, y, 1);
     if (hasRightWall) setNorthWall(x, y, 1);
   }
-  turnLeft();
-  finishTurn();
-  orientation = (orientation+1)%4;
-  hasRightWall = readRightWallSensor();
-  if (orientation == 0){
-    if (hasRightWall) setEastWall(x, y, 1);
-  }else if (orientation == 1){
-    if (hasRightWall) setSouthWall(x, y, 1);
-  }else if (orientation == 2){
-    if (hasRightWall) setWestWall(x, y, 1);
-  }else{
-    if (hasRightWall) setNorthWall(x, y, 1);
-  }
+//  turnRight();
+//  finishTurn();
+//  orientation = (orientation+1)%4;
+//  hasRightWall = readRightWallSensor();
+//  if (orientation == 0){
+//    if (hasRightWall) setEastWall(x, y, 1);
+//  }else if (orientation == 1){
+//    if (hasRightWall) setSouthWall(x, y, 1);
+//  }else if (orientation == 2){
+//    if (hasRightWall) setWestWall(x, y, 1);
+//  }else{
+//    if (hasRightWall) setNorthWall(x, y, 1);
+//  }
 }
 void finishTurn(){
   while (readLeftSensor() == 0 || readRightSensor() == 0);//robot exits line (breaks loop when both sensors are dark)
@@ -222,6 +233,7 @@ void trackLine(){
  * Returns 1 for wall detected and 0 for no wall detected
  */
 int readForwardWallSensor() {
+  delay(5);
   int val = analogRead(frontWallSensor);
   //Serial.print(val);
   //Serial.print(" ");
@@ -239,7 +251,7 @@ int readForwardWallSensor() {
  *  Returns 1 for wall detected and 0 for no wall detected
  */
 int readRightWallSensor() {
-  
+  delay(5);
   int val = analogRead(rightWallSensor);
   //Serial.print(val);
   //Serial.print(" ");
@@ -261,7 +273,7 @@ int readLeftSensor(){
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 357? 1:0;
+  return val > 357? 1:0;//357
   }
 int readRightSensor(){
   digitalWrite(mux0, HIGH);
@@ -270,7 +282,7 @@ int readRightSensor(){
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 297? 1:0;
+  return val > 297? 1:0;//297
   }
 int readLeftmostSensor(){
   digitalWrite(mux0, HIGH);
