@@ -60,7 +60,7 @@ void setup(void)
   // Print preamble
   //
 
-  Serial.begin(57600);
+  Serial.begin(9600);
   printf_begin();
   printf("\n\rRF24/examples/GettingStarted/\n\r");
   printf("ROLE: %s\n\r",role_friendly_name[role]);
@@ -118,31 +118,6 @@ void setup(void)
   //
 
   radio.printDetails();
-  // clear x coordinate
-  data &= 0xfffffffffffffff0;
-  // set x = 4
-  data |= 0x4;
-  // clear y coordinate
-  data &= 0xffffffffffffff0f;
-  // set y = 9
-  data |= 0x9 << 4;
-  // North wall = 0
-  bitClear(data, 8);
-  // East wall = 1
-  data |= 1 << 9;
-  // South wall = 0
-  bitClear(data, 10);
-  // West wall = 1
-  data |= 1 << 11;
-  // Treasure Color is Red
-  bitClear(data, 12);
-  // clear treasure shape
-  bitClear(data, 13);
-  bitClear(data, 14); 
-  // Treasure is square
-  data |= 0b10 << 13;
-  // explored
-  data |= 1 << 15;
 }
 
 void loop(void)
@@ -150,57 +125,57 @@ void loop(void)
   //
   // Ping out role.  Repeatedly send the current time
   //
-
-  if (role == role_ping_out)
-  {
-    // First, stop listening so we can talk.
-    radio.stopListening();
-    int x = data & 0xf;
-    int y = (data & 0xf0) >> 4;
-    int n = (data & (1<<8)) >> 8;
-    int e = (data & (1<<9)) >> 9;
-    int s = (data & (1<<10)) >> 10;
-    int w = (data & (1<<11)) >> 11;
-    int color = (data & (1<<12)) >> 12;
-    int shape = (data & (3<<13)) >> 13;
-    int explored = (data & (1<<15)) >> 15;
-    printf("sending x = %d, y = %d, north = %d, east = %d, south = %d, west = %d, color = %d, shape = %d, explored = %d\n",x,y,n,e,s,w,color,shape,explored);
-    // Take the time, and send it.  This will block until complete
-    bool ok = radio.write( &data, sizeof(unsigned long) );
-
-    if (ok)
-      Serial.println("ok...");
-    else
-      Serial.print("failed.\n\r");
-
-    // Now, continue listening
-    radio.startListening();
-
-    // Wait here until we get a response, or timeout (250ms)
-    unsigned long started_waiting_at = millis();
-    bool timeout = false;
-    while ( ! radio.available() && ! timeout )
-      if (millis() - started_waiting_at > 200 )
-        timeout = true;
-
-    // Describe the results
-    if ( timeout )
-    {
-      Serial.print("Failed, response timed out.\n\r");
-    }
-    else
-    {
-      // Grab the response, compare, and send to debugging spew
-      unsigned long got_time;
-      radio.read( &got_time, sizeof(unsigned long) );
-
-      // Spew it
-      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
-    }
-
-    // Try again 1s later
-    delay(1000);
-  }
+//
+//  if (role == role_ping_out)
+//  {
+//    // First, stop listening so we can talk.
+//    radio.stopListening();
+//    int x = data & 0xf;
+//    int y = (data & 0xf0) >> 4;
+//    int n = (data & (1<<8)) >> 8;
+//    int e = (data & (1<<9)) >> 9;
+//    int s = (data & (1<<10)) >> 10;
+//    int w = (data & (1<<11)) >> 11;
+//    int color = (data & (1<<12)) >> 12;
+//    int shape = (data & (3<<13)) >> 13;
+//    int explored = (data & (1<<15)) >> 15;
+//    printf("sending x = %d, y = %d, north = %d, east = %d, south = %d, west = %d, color = %d, shape = %d, explored = %d\n",x,y,n,e,s,w,color,shape,explored);
+//    // Take the time, and send it.  This will block until complete
+//    bool ok = radio.write( &data, sizeof(unsigned long) );
+//
+//    if (ok)
+//      Serial.println("ok...");
+//    else
+//      Serial.print("failed.\n\r");
+//
+//    // Now, continue listening
+//    radio.startListening();
+//
+//    // Wait here until we get a response, or timeout (250ms)
+//    unsigned long started_waiting_at = millis();
+//    bool timeout = false;
+//    while ( ! radio.available() && ! timeout )
+//      if (millis() - started_waiting_at > 200 )
+//        timeout = true;
+//
+//    // Describe the results
+//    if ( timeout )
+//    {
+//      Serial.print("Failed, response timed out.\n\r");
+//    }
+//    else
+//    {
+//      // Grab the response, compare, and send to debugging spew
+//      unsigned long got_time;
+//      radio.read( &got_time, sizeof(unsigned long) );
+//
+//      // Spew it
+//      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
+//    }
+//
+//    // Try again 1s later
+//    delay(1000);
+//  }
 
   //
   // Pong back role.  Receive each packet, dump it out, and send it back
@@ -246,6 +221,7 @@ void loop(void)
           if (color) Serial.print(",tcolor=blue");
           else Serial.print(",tcolor=red");
         }
+        Serial.print("\n");
         
         //printf("x = %d, y = %d, north = %d, east = %d, south = %d, west = %d, color = %d, shape = %d, explored = %d\n",x,y,n,e,s,w,color,shape,explored);
 
@@ -271,27 +247,27 @@ void loop(void)
   // Change roles
   //
 
-  if ( Serial.available() )
-  {
-    char c = toupper(Serial.read());
-    if ( c == 'T' && role == role_pong_back )
-    {
-      printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
-
-      // Become the primary transmitter (ping out)
-      role = role_ping_out;
-      radio.openWritingPipe(pipes[0]);
-      radio.openReadingPipe(1,pipes[1]);
-    }
-    else if ( c == 'R' && role == role_ping_out )
-    {
-      printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");
-
-      // Become the primary receiver (pong back)
-      role = role_pong_back;
-      radio.openWritingPipe(pipes[1]);
-      radio.openReadingPipe(1,pipes[0]);
-    }
-  }
+//  if ( Serial.available() )
+//  {
+//    char c = toupper(Serial.read());
+//    if ( c == 'T' && role == role_pong_back )
+//    {
+//      printf("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK\n\r");
+//
+//      // Become the primary transmitter (ping out)
+//      role = role_ping_out;
+//      radio.openWritingPipe(pipes[0]);
+//      radio.openReadingPipe(1,pipes[1]);
+//    }
+//    else if ( c == 'R' && role == role_ping_out )
+//    {
+//      printf("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK\n\r");
+//
+//      // Become the primary receiver (pong back)
+//      role = role_pong_back;
+//      radio.openWritingPipe(pipes[1]);
+//      radio.openReadingPipe(1,pipes[0]);
+//    }
+//  }
 }
 // vim:cin:ai:sts=2 sw=2 ft=cpp
