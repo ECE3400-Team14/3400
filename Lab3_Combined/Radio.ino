@@ -111,13 +111,13 @@ void sendMaze(){
   unsigned long started_waiting_at = millis();
   bool timeout = false;
   while ( ! radio.available() && ! timeout )
-    if (millis() - started_waiting_at > 200 )
+    if (millis() - started_waiting_at > 100 )
       timeout = true;
 
   // if timed out, resend
   if ( timeout )
   {
     Serial.print("Failed, response timed out.\n\r");
-    sendMaze();
+    //sendMaze();
   }
 }

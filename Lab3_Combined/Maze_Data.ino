@@ -23,7 +23,7 @@ void setEastWall(int x, int y, int valid){
   }
 void setSouthWall(int x, int y, int valid){
   if(valid) bitSet(mazeData[x+rowLength*y], 10);
-  else bitClear(mazeData[x+rowLength*y], 10);
+  else {bitClear(mazeData[x+rowLength*y], 10);}
   
   }
 void setWestWall(int x, int y, int valid){

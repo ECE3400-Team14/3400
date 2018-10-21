@@ -17,11 +17,11 @@ int fft_mux_pin = 6;
 bool fft_detect = false;
 bool has_started = false;
 
-int orientation = 1; //0=north, 1=east, 2=south, 3=west
+int orientation = 0; //0=north, 1=east, 2=south, 3=west
 int x = 1;
-int y = 0;
+int y = 2;
 
-bool debug = false;//enable and disable debug mode
+bool debug = false;
 
 void setup() {
   left.attach(5);//left servo pin 5
@@ -65,7 +65,7 @@ void loop() {
    int hasRightWall = readRightWallSensor();
    int hasFrontWall = readForwardWallSensor();
    updateMaze();
-   //sendMaze();
+   sendMaze();
    if (hasRightWall==1&&hasFrontWall==0) {
     forwardAndStop();
     updateCoor();
@@ -149,17 +149,21 @@ void updateMaze(){
   int hasFrontWall = readForwardWallSensor();
   int hasRightWall = readRightWallSensor();
   if (orientation == 0){
-    if (hasFrontWall) setNorthWall(x, y, 1);
-    if (hasRightWall) setEastWall(x, y, 1);
+    setNorthWall(x, y, hasFrontWall);
+    setEastWall(x, y, hasRightWall);
+    //setWestWall(x,y,0);
   }else if (orientation == 1){
-    if (hasFrontWall) setEastWall(x, y, 1);
-    if (hasRightWall) setSouthWall(x, y, 1);
+    setEastWall(x, y, hasFrontWall);
+    setSouthWall(x, y, hasRightWall);
+    //setNorthWall(x,y,0);
   }else if (orientation == 2){
-    if (hasFrontWall) setSouthWall(x, y, 1);
-    if (hasRightWall) setWestWall(x, y, 1);
+    setSouthWall(x, y, hasFrontWall);
+    setWestWall(x, y, hasRightWall);
+    //setEastWall(x,y,0);
   }else{
-    if (hasFrontWall) setWestWall(x, y, 1);
-    if (hasRightWall) setNorthWall(x, y, 1);
+    setWestWall(x, y, hasFrontWall);
+    setNorthWall(x, y, hasRightWall);
+    //setSouthWall(x,y,0);
   }
 //  turnRight();
 //  finishTurn();
@@ -250,10 +254,11 @@ void trackLine(){
  * Returns 1 for wall detected and 0 for no wall detected
  */
 int readForwardWallSensor() {
-  delay(5);
-  int val = analogRead(frontWallSensor);
-  //Serial.print(val);
-  //Serial.print(" ");
+  int val = 0;
+  for (int i = 0; i < 5; i++) {
+    val += analogRead(frontWallSensor);
+  }
+  val = val / 5;
   if (val>180){
     digitalWrite(frontWallLED, HIGH);
     return 1;
@@ -262,16 +267,30 @@ int readForwardWallSensor() {
     digitalWrite(frontWallLED, LOW);
     return 0;
   }
+//  delay(5);
+//  int val = analogRead(frontWallSensor);
+//  //Serial.print(val);
+//  //Serial.print(" ");
+//  if (val>180){
+//    digitalWrite(frontWallLED, HIGH);
+//    return 1;
+//  }
+//  else{
+//    digitalWrite(frontWallLED, LOW);
+//    return 0;
+//  }
 }
 
 /* read right-facing sensor. 
  *  Returns 1 for wall detected and 0 for no wall detected
  */
 int readRightWallSensor() {
-  delay(5);
-  int val = analogRead(rightWallSensor);
-  //Serial.print(val);
-  //Serial.print(" ");
+
+  int val = 0;
+  for (int i = 0; i < 5; i++) {
+    val += analogRead(rightWallSensor);
+  }
+  val = val / 5;
   if (val>180){
     digitalWrite(rightWallLED, HIGH);
     return 1;
@@ -280,6 +299,18 @@ int readRightWallSensor() {
     digitalWrite(rightWallLED, LOW);
     return 0;
   }
+//  delay(5);
+//  int val = analogRead(rightWallSensor);
+//  //Serial.print(val);
+//  //Serial.print(" ");
+//  if (val>180){
+//    digitalWrite(rightWallLED, HIGH);
+//    return 1;
+//  }
+//  else{
+//    digitalWrite(rightWallLED, LOW);
+//    return 0;
+//  }
 }
   
 /* returns 0 if white detected, 1 if black */
