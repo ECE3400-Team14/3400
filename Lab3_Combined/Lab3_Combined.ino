@@ -17,9 +17,9 @@ int fft_mux_pin = 6;
 bool fft_detect = false;
 bool has_started = false;
 
-int orientation = 0; //0=north, 1=east, 2=south, 3=west
-int x = 0;
-int y = 0;
+int orientation; //0=north, 1=east, 2=south, 3=west
+int x;
+int y;
 
 bool debug = false;//enable and disable debug mode
 
@@ -46,12 +46,18 @@ void setup() {
   Serial.println("FFT Setup Complete");
 
    digitalWrite(fft_mux_pin, LOW);
+
   
   while(has_started == false) {
-    fft_analyze();
-    Serial.println("Waiting");
+     fft_analyze();
+     Serial.println("Waiting");
   }
   digitalWrite(fft_mux_pin, HIGH);
+
+
+  orientation = 1; //0=north, 1=east, 2=south, 3=west
+  x = 1;
+  y = 0;
   
   initMaze();
   printf_begin();
@@ -62,8 +68,8 @@ void loop() {
   if (!debug) {
    int hasRightWall = readRightWallSensor();
    int hasFrontWall = readForwardWallSensor();
-   //updateMaze();
-   //sendMaze();
+   updateMaze();
+   sendMaze();
    if (hasRightWall==1&&hasFrontWall==0) {
     forwardAndStop();
     updateCoor();
@@ -71,12 +77,14 @@ void loop() {
    else if (hasRightWall==1&&hasFrontWall==1){
     turnLeft();
     finishTurn();
-    orientation = (orientation-1)%4;
+    orientation = (orientation == 0) ? 3 : orientation - 1; 
+    //
+    //updateCoor();
    }
    else if (hasRightWall==0){
     turnRight();
     finishTurn();
-    orientation = (orientation+1)%4;
+    orientation = (orientation == 3) ? 0 : (orientation+1);
     forwardAndStop();
     updateCoor();
    }
@@ -84,44 +92,55 @@ void loop() {
   //debug
   else {
    // troubleshooting code block:
-   int leftmost = readLeftmostSensor();
-   Serial.print("LL:");
-   Serial.print(leftmost);
-   Serial.print("|");
-   int left = readLeftSensor ();
-   Serial.print("L:");
-   Serial.print(left);
-   Serial.print("|");
-   int right = readRightSensor();
-   Serial.print("R:");
-   Serial.print(right);
-   Serial.print("|");
-   int rightmost = readRightmostSensor();
-   Serial.print("RR:");
-   Serial.print(rightmost);
-   Serial.print("|");
-   int hasRightWall = readRightWallSensor(); 
-   int hasFrontWall = readForwardWallSensor();
-   Serial.print("RW:");
-   Serial.print(hasRightWall);
-   Serial.print(" ");
-   Serial.print("FW:");
-   Serial.print(hasFrontWall);
-   //Serial.println();
-   Serial.print(", ");
-   fft_analyze();
+//   int leftmost = readLeftmostSensor();
+//   Serial.print("LL:");
+//   Serial.print(leftmost);
+//   Serial.print("|");
+//   int left = readLeftSensor ();
+//   Serial.print("L:");
+//   Serial.print(left);
+//   Serial.print("|");
+//   int right = readRightSensor();
+//   Serial.print("R:");
+//   Serial.print(right);
+//   Serial.print("|");
+//   int rightmost = readRightmostSensor();
+//   Serial.print("RR:");
+//   Serial.print(rightmost);
+//   Serial.print("|");
+//   int hasRightWall = readRightWallSensor(); 
+//   int hasFrontWall = readForwardWallSensor();
+//   Serial.print("RW:");
+//   Serial.print(hasRightWall);
+//   Serial.print(" ");
+//   Serial.print("FW:");
+//   Serial.print(hasFrontWall);
+//   //Serial.println();
+//   Serial.print(", ");
+//   fft_analyze();
    Serial.println();
+   updateCoor();
+   Serial.println(orientation);
+   Serial.print(x);
+   Serial.print(", ");
+   Serial.print(y);
+   Serial.println();
+   orientation = (orientation == 0) ? 3 : orientation - 1; 
+   updateMaze();
+   sendMaze();
+   delay(1000);
   }
 }
 void updateCoor(){
   if (orientation == 0){
-    y += 1;
+    x = (x == 0) ? 0 : x - 1;
   }else if (orientation == 1){
-    x += 1;
+    y += 1;
   }else if (orientation == 2){
-    y -= 1;
+    x += 1;
   }else{
-    x -= 1;
+    y = (y == 0) ? 0 : y - 1;
+    //x -= 1;
   }
 }
 //temporary solution since only 2 wall sensors

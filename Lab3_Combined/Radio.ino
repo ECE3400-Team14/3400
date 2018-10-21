@@ -97,6 +97,7 @@ void sendMaze(){
   // First, stop listening so we can talk.
   radio.stopListening();
   // Take the time, and send it.  This will block until complete
+  //Serial.println(mazeData[x+rowLength*y]);
   bool ok = radio.write( mazeData+x+rowLength*y, sizeof(unsigned int) );
   if (ok)
     Serial.println("ok...");

@@ -3,10 +3,11 @@ const int rowLength = 2;
 const int colLength = 3;
 
 void initMaze(){
-  for (int x = 0; x < colLength; x++){
-    for (int y = 0; y < rowLength; y++){
-      int coordinates = x + y << 4;
-      mazeData[x+rowLength*y] = coordinates;
+  for (int xn = 0; xn < rowLength; xn++){
+    for (int yn = 0; yn < colLength; yn++){
+      int coordinates = 0;
+      coordinates = coordinates | (xn | (yn << 4));
+      mazeData[xn+rowLength*yn] = coordinates;
       }
     }
   }
