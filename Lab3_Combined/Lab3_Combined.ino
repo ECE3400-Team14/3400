@@ -11,7 +11,7 @@ int mux0=2;
 int mux1=4;
 int muxRead = A3;
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
-int fft_cycle = 10;
+int fft_cycle = 5;
 int fft_mux_pin = 6;
 
 bool fft_detect = false;
@@ -22,6 +22,7 @@ int x = 1;
 int y = 2;
 
 bool debug = false;
+bool transmit = true;
 
 void setup() {
   left.attach(5);//left servo pin 5
@@ -65,7 +66,7 @@ void loop() {
    int hasRightWall = readRightWallSensor();
    int hasFrontWall = readForwardWallSensor();
    updateMaze();
-   sendMaze();
+   if(transmit) { sendMaze(); }
    if (hasRightWall==1&&hasFrontWall==0) {
     forwardAndStop();
     updateCoor();
@@ -181,7 +182,7 @@ void updateMaze(){
 }
 void finishTurn(){
   while (readLeftSensor() == 0 || readRightSensor() == 0);//robot exits line (breaks loop when both sensors are dark)
-  while (readLeftSensor() == 1 && readRightSensor() == 1);//robot enters line again (both line sensors light)
+  while (readLeftSensor() == 1 || readRightSensor() == 1);//robot enters line again (both line sensors light)
   stopMovement();
 }
 void forwardUntilOffIntersection() {
@@ -196,22 +197,18 @@ void forwardAndStop(){
       //Serial.println("BEGIN");
       trackLine();
       //perform FFT every __ number of cycles
+      
       if (i == fft_cycle) {
         Serial.println("Running fft");
-        /*
-        stopMovement();
-        while(true) {
-          fft_analyze();
-          Serial.println(fft_detect);
-        }*/
         fft_analyze();
-        while (fft_detect/**/) {
+        while (fft_detect) {
           stopMovement();
           fft_analyze();
         } //Added
         i = 0;
       }
       else { i++; }
+      
     }
   stopMovement();
 }
@@ -254,12 +251,13 @@ void trackLine(){
  * Returns 1 for wall detected and 0 for no wall detected
  */
 int readForwardWallSensor() {
+  //delay(5);
   int val = 0;
   for (int i = 0; i < 5; i++) {
     val += analogRead(frontWallSensor);
   }
   val = val / 5;
-  if (val>180){
+  if (val>150){
     digitalWrite(frontWallLED, HIGH);
     return 1;
   }
@@ -285,13 +283,13 @@ int readForwardWallSensor() {
  *  Returns 1 for wall detected and 0 for no wall detected
  */
 int readRightWallSensor() {
-
+  //delay(5);
   int val = 0;
   for (int i = 0; i < 5; i++) {
     val += analogRead(rightWallSensor);
   }
   val = val / 5;
-  if (val>180){
+  if (val>150){
     digitalWrite(rightWallLED, HIGH);
     return 1;
   }
@@ -321,7 +319,7 @@ int readLeftSensor(){
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 357? 1:0;//357
+  return val > 400? 1:0;//357
   }
 int readRightSensor(){
   digitalWrite(mux0, HIGH);
@@ -330,7 +328,7 @@ int readRightSensor(){
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 297? 1:0;//297
+  return val > 350? 1:0;//297
   }
 int readLeftmostSensor(){
   digitalWrite(mux0, HIGH);
@@ -367,12 +365,12 @@ void forward(){
   writeRight(180);
   }
 void turnLeft(){
-  writeLeft(0);
-  writeRight(180);
+  writeLeft(20);//0
+  writeRight(160);//180
   }
 void turnRight(){
-  writeLeft(180);
-  writeRight(0);
+  writeLeft(160);//180
+  writeRight(20);//0
   }
 void stopMovement(){
   writeLeft(90);
