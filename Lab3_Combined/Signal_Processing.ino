@@ -10,8 +10,9 @@ Based off example sketch fft_adc_serial provided by the FFT library
 
 //bool has_started = false;//false: Audio Analysis Stage, true: IR Analysis Stage
 bool IR_initilized = false;
+int IR_threshold = 55;
 //Audio FFT Variables
-int threshold = 120;//the monitored signal bin amplitude threshold for detection
+int threshold = 100;//the monitored signal bin amplitude threshold for detection
 int start_count = 0;// counter for keeping track of back-to-back detections
 int count_max = 10;// the number of back-to-back detections for a confirmed detection
 
@@ -91,7 +92,7 @@ void fft_analyze() {
       }
       else{
         //Serial.println(fft_log_out[21]);
-        if (fft_log_out[11] > 55  ){
+        if (fft_log_out[11] > IR_threshold /*55*/  ){
             Serial.println("Robot Detected!!!");
             fft_detect = true;
         }
