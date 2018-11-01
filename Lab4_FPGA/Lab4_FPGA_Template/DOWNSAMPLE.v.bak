@@ -1,0 +1,5 @@
+module DOWNSAMPLE (
+  RGB565,
+  RGB332
+);
+
