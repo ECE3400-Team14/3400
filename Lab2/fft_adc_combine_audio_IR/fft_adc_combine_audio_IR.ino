@@ -12,7 +12,7 @@ port at 115.2kb.
 
 #include <FFT.h> // include the library
 
-bool has_started = true;//false: Audio Analysis Stage, true: IR Analysis Stage
+bool has_started = false;//false: Audio Analysis Stage, true: IR Analysis Stage
 bool IR_initilized = false;
 //Audio FFT Variables
 int threshold = 140;//the monitored signal bin amplitude threshold for detection
@@ -21,7 +21,7 @@ int count_max = 5;// the number of back-to-back detections for a confirmed detec
 
 //TODO: add any IR local variables here
 
-int mux_pin = 2; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
+int mux_pin = 0; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
 
 void setup() {
   Serial.begin(9600); // use the serial port
