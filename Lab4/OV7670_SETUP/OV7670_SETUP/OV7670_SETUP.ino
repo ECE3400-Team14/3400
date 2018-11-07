@@ -16,13 +16,15 @@ void setup() {
   // TODO: READ KEY REGISTERS
   read_key_registers();
   delay(100);
-  OV7670_write_register(0x11, 0xC0);//use external clock (was 0x40)
+  OV7670_write_register(0x11, 0x40);//use external clock (was 0x40)
+  delay(100);
+  OV7670_write_register(0x42, 0x4);//COM17 enable DSP color bar
   delay(100);
   //OV7670_write_register(0x3E, 0x4);//enable manual scaling
-  OV7670_write_register(0x12, 0x0E);//set camera pixel format QCIF and enable color bar test 00001110/00100110
-  //OV7670_write_register(0x12, 0xC);//set camera pixel format and disable color bar test
+  //OV7670_write_register(0x12, 0x0E);//set camera pixel format QCIF and enable color bar test 00001110/00100110
+  OV7670_write_register(0x12, 0x0C);//set camera pixel format and disable color bar test 00001100
   delay(100);
-  OV7670_write_register(0x0C, 0x8);//enable scaling COM3
+  //OV7670_write_register(0x0C, 0x8);//enable scaling COM3
   delay(100);
   OV7670_write_register(0x14, 0x01);//automated gain ceiling of 2x
   delay(100);
@@ -31,8 +33,7 @@ void setup() {
   //OV7670_write_register(0x70, 0x80);//enable color bar test xsc
 //  delay(100);
   //OV7670_write_register(0x71, 0x00);//enable color bar test (second bit) ysc
-  delay(100);
-  OV7670_write_register(0x42, 0x4);//COM17 enable DSP color bar
+  
   delay(100);
   
   //OV7670_write_register(0x1E, 0x30);//flip image x/y
@@ -63,6 +64,7 @@ void read_key_registers(){
   byte scaling_ysc = read_register_value(0x71); //enabling the color bar test
   byte com17 = read_register_value(0x42); //com17
   byte dblv = read_register_value(0x6B);
+  byte rgb444 = read_register_value(0x8C);
   delay(100);
   Serial.print(com7);
   Serial.print(", ");
@@ -85,6 +87,8 @@ void read_key_registers(){
   Serial.print(com17);
   Serial.print(", ");
   Serial.print(dblv);
+   Serial.print(", ");
+  Serial.print(rgb444);
   Serial.println();
   delay(100);
 }
