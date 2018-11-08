@@ -3,10 +3,10 @@
 Servo left;
 Servo right;
 int buttonPin = 0;
-int rightWallSensor = A5;
+int rightWallSensor = A5;                                
 int rightWallLED = 7;//TEMP
-int frontWallSensor = A1;
-int leftWallSensor = A4;
+int frontWallSensor = A4;                                                                                          
+int leftWallSensor = A1;
 int frontWallLED = 8;
 int mux0=2;
 int mux1=4;
@@ -50,7 +50,7 @@ void setup() {
 
    digitalWrite(fft_mux_pin, LOW);
 
-  
+//  
   while(has_started == false) {
      fft_analyze();
      Serial.println("Waiting");
@@ -64,39 +64,40 @@ void setup() {
 
 void loop() {
   if (!debug) {
-   int hasRightWall = readRightWallSensor();
-   int hasFrontWall = readForwardWallSensor();
-   int hasLeftWall = readLeftWallSensor();
-   updateMaze();
-   if(transmit) { sendMaze(); }
-   if (hasRightWall==1&&hasFrontWall==0) {
-    forwardAndStop();
-    updateCoor();
-   }
-   else if (hasRightWall==1&&hasFrontWall==1&&hasLeftWall==0){
-    turnLeft();
-    finishTurn();
-    orientation = (orientation == 0) ? 3 : orientation - 1; 
-    //
-    //updateCoor();
-   }
-   else if (hasRightWall==1&&hasFrontWall==1&&hasLeftWall==1){
-    turnLeft();
-    finishTurn();
-    orientation = (orientation == 0) ? 3 : orientation - 1;
-    turnLeft();
-    finishTurn();
-    orientation = (orientation == 0) ? 3 : orientation - 1;  
-    //
-    //updateCoor();
-   }
-   else if (hasRightWall==0){
-    turnRight();
-    finishTurn();
-    orientation = (orientation == 3) ? 0 : (orientation+1);
-    forwardAndStop();
-    updateCoor();
-   }
+//   int hasRightWall = readRightWallSensor();
+//   int hasFrontWall = readForwardWallSensor();
+//   int hasLeftWall = readLeftWallSensor();
+//   updateMaze();
+//   if(transmit) { sendMaze(); }
+//   if (hasRightWall==1&&hasFrontWall==0) {
+//    forwardAndStop();
+//    updateCoor();
+//   }
+//   else if (hasRightWall==1&&hasFrontWall==1/*&&hasLeftWall==0*/){
+//    turnLeft();
+//    finishTurn();
+//    orientation = (orientation == 0) ? 3 : orientation - 1; 
+//    //
+//    //updateCoor();
+//   }
+////   else if (hasRightWall==1&&hasFrontWall==1&&hasLeftWall==1){
+////    turnLeft();
+////    finishTurn();
+////    orientation = (orientation == 0) ? 3 : orientation - 1;
+////    turnLeft();
+////    finishTurn();
+////    orientation = (orientation == 0) ? 3 : orientation - 1;  
+////    //
+////    //updateCoor();
+////   }
+//   else if (hasRightWall==0){
+//    turnRight();
+//    finishTurn();
+//    orientation = (orientation == 3) ? 0 : (orientation+1);
+//    forwardAndStop();
+//    updateCoor();
+//   }
+    search();
   }
   //debug
   else {
@@ -119,11 +120,15 @@ void loop() {
    Serial.print("|");
    int hasRightWall = readRightWallSensor(); 
    int hasFrontWall = readForwardWallSensor();
-   Serial.print("RW:");
-   Serial.print(hasRightWall);
+   int hasLeftWall = readLeftWallSensor();
+   Serial.print("LW:");
+   Serial.print(hasLeftWall);
    Serial.print(" ");
    Serial.print("FW:");
    Serial.print(hasFrontWall);
+   Serial.print(" ");
+   Serial.print("RW:");
+   Serial.print(hasRightWall);
    //Serial.println();
    Serial.print(", ");
    fft_analyze();
@@ -142,6 +147,85 @@ void loop() {
 //   delay(1000);
   }
 }
+
+void rightWallFollowing() {
+  int hasRightWall = readRightWallSensor();
+   int hasFrontWall = readForwardWallSensor();
+   int hasLeftWall = readLeftWallSensor();
+   updateMaze();
+   if(transmit) { sendMaze(); }
+   if (hasRightWall==1&&hasFrontWall==0) {
+    forwardAndStop();
+    updateCoor();
+   }
+   else if (hasRightWall==1&&hasFrontWall==1/*&&hasLeftWall==0*/){
+    turnLeft();
+    finishTurn();
+    orientation = (orientation == 0) ? 3 : orientation - 1; 
+    //
+    //updateCoor();
+   }
+//   else if (hasRightWall==1&&hasFrontWall==1&&hasLeftWall==1){
+//    turnLeft();
+//    finishTurn();
+//    orientation = (orientation == 0) ? 3 : orientation - 1;
+//    turnLeft();
+//    finishTurn();
+//    orientation = (orientation == 0) ? 3 : orientation - 1;  
+//    //
+//    //updateCoor();
+//   }
+   else if (hasRightWall==0){
+    turnRight();
+    finishTurn();
+    orientation = (orientation == 3) ? 0 : (orientation+1);
+    forwardAndStop();
+    updateCoor();
+   }
+}
+
+void search() {
+    int hasRightWall = readRightWallSensor();
+   int hasFrontWall = readForwardWallSensor();
+   int hasLeftWall = readLeftWallSensor();
+   updateMaze();
+   if(transmit) { sendMaze(); }
+   
+   if (hasFrontWall==0) {
+    forwardAndStop();
+    updateCoor();
+   }
+   else if (hasLeftWall == 0) {
+    turnLeft();
+    finishTurn();
+    orientation = (orientation == 0) ? 3 : orientation - 1;
+    forwardAndStop();
+    updateCoor();
+   }
+   else if (hasRightWall==0){
+    turnRight();
+    finishTurn();
+    orientation = (orientation == 3) ? 0 : (orientation+1);
+    forwardAndStop();
+    updateCoor();
+   }
+   else {
+    //do nothing
+    stopMovement();
+   }
+//   else if (hasRightWall==1&&hasFrontWall==1&&hasLeftWall==1){
+//    turnLeft();
+//    finishTurn();
+//    orientation = (orientation == 0) ? 3 : orientation - 1;
+//    turnLeft();
+//    finishTurn();
+//    orientation = (orientation == 0) ? 3 : orientation - 1;  
+//    //
+//    //updateCoor();
+//   }
+}
+
+
 void updateCoor(){
   if (orientation == 0){
     x = (x == 0) ? 0 : x - 1;
@@ -274,7 +358,7 @@ int readForwardWallSensor() {
     val += analogRead(frontWallSensor);
   }
   val = val / 5;
-  if (val>150){
+  if (val>120){
     digitalWrite(frontWallLED, HIGH);
     return 1;
   }
