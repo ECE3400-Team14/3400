@@ -12,6 +12,8 @@ void initMaze(){
     }
   }
 
+//need getter functions
+
 void setNorthWall(int x, int y, int valid){
   if(valid) bitSet(mazeData[x+rowLength*y], 8);
   else bitClear(mazeData[x+rowLength*y], 8);
