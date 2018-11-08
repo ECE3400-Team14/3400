@@ -101,7 +101,7 @@ void append_visited(int v) {
 }
 
 //has visiteds
-bool has_visted(int v) {
+bool has_visited(int v) {
   return stack_contains(v, visited);
 }
 

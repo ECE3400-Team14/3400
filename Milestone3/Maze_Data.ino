@@ -23,6 +23,11 @@ void initMaze(){
     }
   }
 
+int getPosition(int x, int y) { return x+rowLength*y;}
+
+int getX(int c) {return c%rowLength;}
+int getY(int c) {return c/rowLength;}
+
 //need getter functions
 int getNorthWall(int x, int y){
   return (mazeData[x+rowLength*y] &= 1<<8)>>8;
@@ -36,6 +41,11 @@ int getSouthWall(int x, int y){
 int getWestWall(int x, int y){
   return (mazeData[x+rowLength*y] &= 1<<11)>>11;
   }
+
+int isExplored(int x, int y) {
+  return bitRead(mazeData[x+rowLength*y], 15);
+}
+
 void setNorthWall(int x, int y, int valid){
   if(valid) bitSet(mazeData[x+rowLength*y], 8);
   else bitClear(mazeData[x+rowLength*y], 8);

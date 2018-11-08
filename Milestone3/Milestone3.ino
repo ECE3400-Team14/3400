@@ -60,6 +60,9 @@ void setup() {
   initMaze();
   printf_begin();
   radioSetup();
+
+  //stack setup
+  initialize_search();
 }
 
 void loop() {
@@ -238,7 +241,75 @@ void updateCoor(){
     //x -= 1;
   }
 }
-//temporary solution since only 2 wall sensors
+
+//sets the frontier
+void updateSearch() {
+  int hasFrontWall = readForwardWallSensor();
+  int hasRightWall = readRightWallSensor();
+  int hasLeftWall = readLeftWallSensor();
+  if(hasFrontWall = 0) {
+    int xn = 0;
+    int yn = 0;
+    if (orientation == 0){
+      xn = x-1;
+      yn = y;
+    }else if (orientation == 1){
+      xn = x;
+      yn = y + 1;
+    }else if (orientation == 2){
+      xn = x+1;
+      yn = y;
+    }else{
+     xn = x;
+     yn = y-1;
+    }
+    if (has_visited(getPosition(xn, yn)) ==false)
+        append_frontier(getPosition(xn, yn));
+  }
+  if(hasLeftWall = 0) {
+    int xn = 0;
+    int yn = 0;
+    if (orientation == 0){
+      xn = x;
+      yn = y-1;
+    }else if (orientation == 1){
+      xn = x-1;
+      yn = y;
+    }else if (orientation == 2){
+      xn = x;
+      yn = y+1;
+    }else{
+     xn = x+1;
+     yn = y;
+    }
+    if (has_visited(getPosition(xn, yn)) ==false)
+        append_frontier(getPosition(xn, yn));
+    //add left space coordinates to frontier
+  }
+  if(hasRightWall = 0) {
+    int xn = 0;
+    int yn = 0;
+    if (orientation == 0){
+      xn = x;
+      yn = y+1;
+    }else if (orientation == 1){
+      xn = x+1;
+      yn = y;
+    }else if (orientation == 2){
+      xn = x;
+      yn = y-1;
+    }else{
+     xn = x-1;
+     yn = y;
+    }
+    if (has_visited(getPosition(xn, yn)) ==false)
+        append_frontier(getPosition(xn, yn));
+  }
+}
+
+
+
+//using three wall sensors
 void updateMaze(){
 //  turnLeft();
 //  finishTurn();
@@ -267,6 +338,7 @@ void updateMaze(){
     setSouthWall(x,y, hasLeftWall);
     //setSouthWall(x,y,0);
   }
+  setExplored(x,y,1);
 //  turnRight();
 //  finishTurn();
 //  orientation = (orientation+1)%4;
