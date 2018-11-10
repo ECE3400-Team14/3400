@@ -11,32 +11,20 @@ void setup() {
   delay(100);
   // TODO: READ KEY REGISTERS
   read_key_registers();
-  delay(100);
+ 
   // TODO: WRITE KEY REGISTERS
   OV7670_write_register(0x12, 0x80);//reset all registers COM7
-  delay(100);
-  OV7670_write_register(0x0C, 0x8);//enable scaling COM3
-  delay(100);
-  OV7670_write_register(0x11, 0x40);//use external clock
-  delay(100);
-  //OV7670_write_register(0x3E, 0x4);//enable manual scaling
-  //OV7670_write_register(0x12, 0xE);//set camera pixel format and enable color bar test
-  OV7670_write_register(0x12, 0xC);//set camera pixel format and disable color bar test
-  delay(100);
-  OV7670_write_register(0x14, 0x0);//automated gain ceiling of 2x
-  delay(100);
-  OV7670_write_register(0x40, 0xD0);//COM15 set for RGB 565 11010000 (208)
-  delay(100);
-  OV7670_write_register(0x70, 0x0);//enable color bar test xsc
-  delay(100);
-  OV7670_write_register(0x71, 0x80);//enable color bar test (second bit) ysc
-  delay(100);
-  //OV7670_write_register(0x42, 0x4);//COM17 enable DSP color bar
-  delay(100);
+  OV7670_write_register(0x0C, 0x8); //COM3 enable scaling
+  OV7670_write_register(0x11, 0xC0);//use external clock
+  OV7670_write_register(0x12, 0xC);//set camera pixel format and enable color bar test with 0xE disable with 0xC
+  OV7670_write_register(0x14, 0x01);//automated gain ceiling of 2x
+  OV7670_write_register(0x40, 0xD0);//COM15 set for RGB 565 11010000 (208) D0
+  OV7670_write_register(0x1E, 0x30); //mirror and flip
+  OV7670_write_register(0x8C, 0x2); //RGB444
+  OV7670_write_register(0x42, 0x0);//COM17 enable DSP color bar
+
   read_key_registers();
-  delay(100);
   set_color_matrix();
-  delay(500);
   Serial.println("The arduino has set the color matrix");
 }
 
