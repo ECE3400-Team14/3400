@@ -122,60 +122,6 @@ void setup(void)
 
 void loop(void)
 {
-  //
-  // Ping out role.  Repeatedly send the current time
-  //
-//
-//  if (role == role_ping_out)
-//  {
-//    // First, stop listening so we can talk.
-//    radio.stopListening();
-//    int x = data & 0xf;
-//    int y = (data & 0xf0) >> 4;
-//    int n = (data & (1<<8)) >> 8;
-//    int e = (data & (1<<9)) >> 9;
-//    int s = (data & (1<<10)) >> 10;
-//    int w = (data & (1<<11)) >> 11;
-//    int color = (data & (1<<12)) >> 12;
-//    int shape = (data & (3<<13)) >> 13;
-//    int explored = (data & (1<<15)) >> 15;
-//    printf("sending x = %d, y = %d, north = %d, east = %d, south = %d, west = %d, color = %d, shape = %d, explored = %d\n",x,y,n,e,s,w,color,shape,explored);
-//    // Take the time, and send it.  This will block until complete
-//    bool ok = radio.write( &data, sizeof(unsigned long) );
-//
-//    if (ok)
-//      Serial.println("ok...");
-//    else
-//      Serial.print("failed.\n\r");
-//
-//    // Now, continue listening
-//    radio.startListening();
-//
-//    // Wait here until we get a response, or timeout (250ms)
-//    unsigned long started_waiting_at = millis();
-//    bool timeout = false;
-//    while ( ! radio.available() && ! timeout )
-//      if (millis() - started_waiting_at > 200 )
-//        timeout = true;
-//
-//    // Describe the results
-//    if ( timeout )
-//    {
-//      Serial.print("Failed, response timed out.\n\r");
-//    }
-//    else
-//    {
-//      // Grab the response, compare, and send to debugging spew
-//      unsigned long got_time;
-//      radio.read( &got_time, sizeof(unsigned long) );
-//
-//      // Spew it
-//      printf("Got response %lu, round-trip delay: %lu\n\r",got_time,millis()-got_time);
-//    }
-//
-//    // Try again 1s later
-//    delay(1000);
-//  }
 
   //
   // Pong back role.  Receive each packet, dump it out, and send it back
@@ -193,7 +139,6 @@ void loop(void)
       {
         // Fetch the payload, and see if this was the last one.
         done = radio.read( &data, sizeof(unsigned long) );
-
         // Spew it
         int x = data & 0xf;
         int y = (data & 0xf0) >> 4;
@@ -206,24 +151,31 @@ void loop(void)
         int explored = (data & (1<<15)) >> 15;
         printf("%d",x);
         printf(",%d", y);
+        if(n==0) Serial.print(",north=false");
+        if(e==0) Serial.print(",east=false");
+        if(s==0) Serial.print(",south=false");
+        if(w==0) Serial.print(",west=false");
         if (n) Serial.print(",north=true");
-        if (e) Serial.print(",east=true");
-        if (s) Serial.print(",south=true");
+        if (e) Serial.print(",east=true"); 
+        if (s) Serial.print(",south=true"); 
         if (w) Serial.print(",west=true");
-        if (shape){
-          if (shape == 3){
-            Serial.print(",tshape=triangle");
-          }else if (shape == 2){
-            Serial.print(",tshape=square");
-          }else{
-            Serial.print(",tshape=circle");
-          }
-          if (color) Serial.print(",tcolor=blue");
-          else Serial.print(",tcolor=red");
-        }
-        Serial.print("\n");
         
+//        if (shape){
+//          if (shape == 3){
+//            Serial.print(",tshape=triangle");
+//          }else if (shape == 2){
+//            Serial.print(",tshape=square");
+//          }else{
+//            Serial.print(",tshape=circle");
+//          }
+//          if (color) Serial.print(",tcolor=blue");
+//          else Serial.print(",tcolor=red");
+//        }
+        Serial.print("\n");
+        //Serial.println("1,1,north=true");
         //printf("x = %d, y = %d, north = %d, east = %d, south = %d, west = %d, color = %d, shape = %d, explored = %d\n",x,y,n,e,s,w,color,shape,explored);
+        //printf("x = 0, y = 0, north = true, east = false, south = false, west = false, color = red, shape = triangle, explored = true\n");
+
 
         // Delay just a little bit to let the other unit
         // make the transition to receiver
@@ -236,7 +188,7 @@ void loop(void)
 
       // Send the final one back.
       radio.write( &data, sizeof(unsigned long) );
-      printf("Sent response.\n\r");
+      //printf("Sent response.\n\r");
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();
