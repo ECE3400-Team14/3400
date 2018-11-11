@@ -1,4 +1,7 @@
-
+/* 
+ * Functions for creating and updating stacks/queues
+ * 
+ */
 /*Depth First Search
 
 Professor's algorithm:
@@ -32,8 +35,8 @@ Wikipedia Algorithm:
 #define maze_size 6//TODO: sync across files
 
 struct Stack {
-  int* elements;//the elements of the stack
-  int top;//the pointer to the top of the stack
+  byte* elements;//the elements of the stack
+  byte top;//the pointer to the top of the stack
 };
 
 struct Stack frontier;
@@ -41,13 +44,13 @@ struct Stack visited;
 
 //initialize a stack
 void init_stack(struct Stack s) {
-  s.elements = new int[maze_size];
+  s.elements = new byte[maze_size];
   s.top = 0;
 }
 
 //push an element to the stack
 void push_stack(int v, struct Stack s) {
-  if ( s.top < maze_size - 1) {
+  if ( s.top < maze_size) {
     s.elements[s.top] = v;
     s.top++;
   }
@@ -68,7 +71,7 @@ int stack_size(struct Stack s) {
 }
 
 //return true if stack contains v
-bool stack_contains(int v, Stack s) {
+bool stack_contains(int v, struct Stack s) {
   if (s.top == 0) return false;
   for(int i = 0; i < s.top; i++) {
     if (s.elements[i] == v) return true;
@@ -105,7 +108,87 @@ bool has_visited(int v) {
   return stack_contains(v, visited);
 }
 
+bool frontier_empty() {
+  return stack_size(frontier) == 0;
+}
 
+
+//////QUEUE//////////
+struct Queue {
+  byte* elements;//the elements of the stack
+  byte first;//the pointer to the top of the stack
+  byte last;
+  byte size;
+};
+
+struct Queue bfs_frontier;
+struct Queue bfs_visited;
+
+void init_queue(struct Queue q) {
+   q.elements = new byte[maze_size];
+   q.first = 0;
+   q.last = 0;
+   q.size = 0;
+}
+
+void push_queue(int v, struct Queue q) {
+  if(q.size < maze_size) {
+    q.elements[q.last] = v;
+    q.last = (q.last == maze_size - 1) ? 0 : q.last + 1;
+    q.size = q.size + 1;
+  }
+}
+
+int pop_queue(struct Queue q) {
+  if(q.size > 0) {
+    int first = q.elements[q.first];
+    q.first = (q.first == maze_size - 1) ? 0 : q.first + 1;
+    q.size = q.size - 1;
+    return first;
+  }
+}
+
+int queue_size(struct Queue q) {
+  return q.size;
+}
+
+bool queue_contains(int v, struct Queue q) {
+  for(int i = 0; i < q.size; i++) {
+    if(q.elements[(q.first + i) % maze_size] == v) return true;
+  }
+  return false;
+}
+
+//BFS Helper Functions//
+
+void initialize_bfs() {
+  init_queue(bfs_frontier);
+  init_queue(bfs_visited);
+}
+
+//append to frontier
+void bfs_append_frontier(int v) {
+  push_queue(v, bfs_frontier);
+}
+
+//pop from frontier
+int bfs_next_frontier() {
+  return pop_queue(bfs_frontier);
+}
+
+//append to visited
+void bfs_append_visited(int v) {
+  push_queue(v, bfs_visited);
+}
+
+//has visiteds
+bool bfs_has_visited(int v) {
+  return queue_contains(v, bfs_visited);
+}
+
+bool bfs_frontier_empty() {
+  return queue_size(bfs_frontier) == 0;
+}
 
 
 

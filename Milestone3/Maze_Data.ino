@@ -1,3 +1,7 @@
+/*
+ * Functions for storing, setting, and getting maze data
+ */
+
 unsigned int mazeData[6];//index = x + rowLength*y, 0,0 bottom left, 2*3 for now
 const int rowLength = 2;
 const int colLength = 3;
@@ -27,6 +31,15 @@ int getPosition(int x, int y) { return x+rowLength*y;}
 
 int getX(int c) {return c%rowLength;}
 int getY(int c) {return c/rowLength;}
+
+//returns true if there is a known wall between (x1,y1) and (x2,y2)
+//Requres (x1,y1) and (x2,y2) are one square apart
+//bool has_wall(int x1, int y1, int x2, int y2) {
+//  return (getNorthWall(x1,y1) | getSouthWall(x2,y2) )
+//  | ( getEastWall(x1,y1) | getWestWall(x2,y2) )
+//  | ( getSouthWall(x1,y1) | getNorthWall(x2,y2) )
+//  | ( getWestWall(x1,y1) | getEastWall(x2,y2) );
+//}
 
 //need getter functions
 int getNorthWall(int x, int y){
