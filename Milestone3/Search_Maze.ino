@@ -154,7 +154,7 @@ int next_position() {
 //TODO: return array of chars generated using BFS
 char get_next_move(int x, int y, int new_x, int new_y, int orientation) {
   //check if there is a wall between them
-  if(x-new_x == 1) {
+  if(x-new_x == 1 && y == new_y) {
     //Go North, if there is no wall
     if(getNorthWall(x,y) == 0) {
       if(orientation == 0) return 'f';
@@ -165,7 +165,7 @@ char get_next_move(int x, int y, int new_x, int new_y, int orientation) {
     }
     
   }
-  else if(y - new_y == -1) {
+  else if(y - new_y == -1 && x == new_x) {
     //go east, if possible
     if(getEastWall(x,y) == 0) {
       if(orientation == 0) return 'r';
@@ -175,7 +175,7 @@ char get_next_move(int x, int y, int new_x, int new_y, int orientation) {
       else return 's';
     }
   }
-  else if (x - new_x == 1) {
+  else if (x - new_x == 1 && y == new_y) {
     //Go South
     if(getSouthWall(x,y) == 0) {
       if(orientation == 0) return 't';
@@ -185,7 +185,7 @@ char get_next_move(int x, int y, int new_x, int new_y, int orientation) {
       else return 's';
     }
   }
-  else if (y - new_y == 1) {
+  else if (y - new_y == 1 && x == new_x) {
     //Go West
     if(getSouthWall(x,y) == 0) {
       if(orientation == 0) return 'l';
@@ -199,8 +199,76 @@ char get_next_move(int x, int y, int new_x, int new_y, int orientation) {
   return 's';
 }
 
+//assumes x,y is explored
+bool canGoForward(int x,int y,int orientation) {
+  if(orientation == 0 && getNorthWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 1 && getEastWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 2 && getSouthWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 3 && getWestWall(x,y) == 0) {
+    return true;
+  }
+  return false;
+}
 
+//assumes x,y is explored
+bool canGoLeft(int x,int y,int orientation) {
+  if(orientation == 0 && getWestWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 1 && getNorthWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 2 && getEastWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 3 && getSouthWall(x,y) == 0) {
+    return true;
+  }
+  return false;
+}
 
+//assumes x,y is explored
+bool canGoRight(int x,int y,int orientation) {
+  if(orientation == 0 && getEastWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 1 && getSouthWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 2 && getWestWall(x,y) == 0) {
+    return true;
+  }
+  else if(orientation == 3 && getNorthWall(x,y) == 0) {
+    return true;
+  }
+  return false;
+}
+
+//at x,y, facing [orientation], the next square coordinate
+int nextCoor(int x,int y,int orientation){
+  byte xn;
+  byte yn;
+  if (orientation == 0){
+    xn = (x == 0) ? 0 : x - 1;
+    yn = y;
+  } else if (orientation == 1){
+    xn = x;
+    yn = y + 1;
+  } else if (orientation == 2){
+    xn = x + 1;
+    yn = y;
+  }else{
+    xn = x;
+    yn = (y == 0) ? 0 : y - 1;
+  }
+  return getPosition(xn,yn);
+}
 
 
 //using three wall sensors
