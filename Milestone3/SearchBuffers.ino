@@ -32,7 +32,6 @@ Wikipedia Algorithm:
 */
 
 //Stack-related-functions
-#define maze_size 6//TODO: sync across files
 
 struct Stack {
   byte* elements;//the elements of the stack
@@ -44,13 +43,17 @@ struct Stack visited;
 
 //initialize a stack
 void init_stack(struct Stack s) {
-  s.elements = new byte[maze_size];
+  s.elements = new byte[mazeSize];
   s.top = 0;
+}
+
+void clear_stack(struct Stack s) {
+  delete s.elements;
 }
 
 //push an element to the stack
 void push_stack(int v, struct Stack s) {
-  if ( s.top < maze_size) {
+  if ( s.top < mazeSize) {
     s.elements[s.top] = v;
     s.top++;
   }
@@ -125,16 +128,16 @@ struct Queue bfs_frontier;
 struct Queue bfs_visited;
 
 void init_queue(struct Queue q) {
-   q.elements = new byte[maze_size];
+   q.elements = new byte[mazeSize];
    q.first = 0;
    q.last = 0;
    q.size = 0;
 }
 
 void push_queue(int v, struct Queue q) {
-  if(q.size < maze_size) {
+  if(q.size < mazeSize) {
     q.elements[q.last] = v;
-    q.last = (q.last == maze_size - 1) ? 0 : q.last + 1;
+    q.last = (q.last == mazeSize - 1) ? 0 : q.last + 1;
     q.size = q.size + 1;
   }
 }
@@ -142,7 +145,7 @@ void push_queue(int v, struct Queue q) {
 int pop_queue(struct Queue q) {
   if(q.size > 0) {
     int first = q.elements[q.first];
-    q.first = (q.first == maze_size - 1) ? 0 : q.first + 1;
+    q.first = (q.first == mazeSize - 1) ? 0 : q.first + 1;
     q.size = q.size - 1;
     return first;
   }
@@ -154,7 +157,7 @@ int queue_size(struct Queue q) {
 
 bool queue_contains(int v, struct Queue q) {
   for(int i = 0; i < q.size; i++) {
-    if(q.elements[(q.first + i) % maze_size] == v) return true;
+    if(q.elements[(q.first + i) % mazeSize] == v) return true;
   }
   return false;
 }
@@ -162,8 +165,12 @@ bool queue_contains(int v, struct Queue q) {
 //BFS Helper Functions//
 
 void initialize_bfs() {
-  init_queue(bfs_frontier);
+  //init_queue(bfs_frontier); (if needed)
   init_queue(bfs_visited);
+}
+
+void clear_bfs() {
+  delete bfs_visited.elements;
 }
 
 //append to frontier

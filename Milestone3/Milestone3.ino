@@ -1,33 +1,44 @@
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
  * 
- * Written by: David Burgstahler (dfb93), Gregory Kaiser (ghk48), Andrew Lin (yl656), and Michaelangelo Rodriguez Ayala
+ * Written by: David Burgstahler (dfb93), Gregory Kaiser (ghk48), Andrew Lin (yl656), and Michaelangelo Rodriguez Ayala (mr2242)
  */
-
+#include <QueueArray.h>
+#include <StackArray.h>
 #include <Servo.h>
 #include "printf.h"
 Servo left;
 Servo right;
-int buttonPin = 0;
-int rightWallSensor = A5;                                
+int buttonPin = 0;//pin assigned to start button (NOT CURRENTLY IN USE)
+int rightWallSensor = A5;//read right wall sensor data                                
 int rightWallLED = 7;//TEMP
 int frontWallSensor = A4;                                                                                          
 int leftWallSensor = A1;
 int frontWallLED = 8;
-int mux0=2;
-int mux1=4;
-int muxRead = A3;
+int mux0=2;//line sensor mux input 0
+int mux1=4;//line sensor mux input 2
+int muxRead = A3;//line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
-int fft_cycle = 5;
-int fft_mux_pin = 6;
+int fft_cycle = 5;//number of movement cycles between FFT detections (see forwardAndStop())
+int fft_mux_pin = 6;//pin for selecting Audio/IR signal
 
-bool fft_detect = false;
-bool has_started = false;
+//fft settings
+bool fft_detect = false;//starting state of fft
+bool has_started = false;//false: wait for audio signal
 
+//maze data
+#define mazeSize 6
+#define rowLength 2
+#define colLength 3
+
+//starting position
 int orientation = 0; //0=north, 1=east, 2=south, 3=west
 int x = 1;
 int y = 2;
 
+StackArray<char>* movementStack;//stack of movements to follow
+
+//robot settings
 bool debug = false;
 bool transmit = true;
 
@@ -162,7 +173,24 @@ void rightWallFollowing() {
    }
 }
 
-/* A basic DFS/BFS search algorith*/
+
+/* Is it BFS? Is it Dijkstra? It's kinda both and neither
+ *  Adapted from Lecture 17, Slide 14
+ * 
+ * At each square, this algorithm performs a search for the next closest frontier square that is accessible
+ * from all visited squares. 
+ * 
+ * Once this square is found, it generates the path requiring the fewest movements (1 movement = move between squares or a turn)
+ * through the explored squares and executes this path
+ * 
+ */
+void bfs_mod_search() {
+  updateMaze();//analyze walls, set square as explored
+  bfs_mod(getPosition(x,y));//find the closest frontier square and create a path to it
+  moveToNextUnexplored();//perform set of actions gererated by bfs_mod
+}
+
+/* (UNIMPLEMENTED) A basic DFS/BFS search algorith*/
 void search() {
     //get next frontier position
     int next_pos = next_position();

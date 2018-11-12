@@ -2,9 +2,9 @@
  * Functions for storing, setting, and getting maze data
  */
 
-unsigned int mazeData[6];//index = x + rowLength*y, 0,0 bottom left, 2*3 for now
-const int rowLength = 2;
-const int colLength = 3;
+unsigned int mazeData[mazeSize];//index = x + rowLength*y, 0,0 bottom left, 2*3 for now
+//const int rowLength = 2;
+//const int colLength = 3;
 
 /*
  * x[3:0]

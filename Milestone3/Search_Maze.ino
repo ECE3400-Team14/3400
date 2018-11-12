@@ -3,13 +3,22 @@
  * 
  */
 
+//once moves to next node have been created, run all of the moves in the movement stack
+void moveToNextUnexplored() {
+  while(!movementStack->isEmpty()) {
+    char move = movementStack->pop();
+    performAction(move);
+  }
+}
+
+
 
 //f: forward
-//l: turn left and forward
-//r: turn right and forward
-//t: turn 180 deg. and forward
+//l: turn left
+//r: turn right
+//t: turn 180 deg. and forward (don't use)
 //s: stop
-//TODO: take in array of actions
+//TODO: add Wall sensor/IR feedback to make sure we don't crash
 void performAction(char m) {
   if(m == 'f') {
     forwardAndStop();
@@ -19,15 +28,15 @@ void performAction(char m) {
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-    forwardAndStop();
-    updateCoor();
+//    forwardAndStop();
+//    updateCoor();
   }
   else if (m = 'r') {
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation+1);
-    forwardAndStop();
-    updateCoor();
+//    forwardAndStop();
+//    updateCoor();
   }
   else if (m = 't') {
     turnLeft();
@@ -199,7 +208,11 @@ char get_next_move(int x, int y, int new_x, int new_y, int orientation) {
   return 's';
 }
 
-//assumes x,y is explored
+/*  Returns true if there is no forward wall 
+ *  in orientation [orientation] at x,y, false otherwise
+ *  
+ *  Requires: x,y is explored
+ */
 bool canGoForward(int x,int y,int orientation) {
   if(orientation == 0 && getNorthWall(x,y) == 0) {
     return true;
@@ -216,7 +229,11 @@ bool canGoForward(int x,int y,int orientation) {
   return false;
 }
 
-//assumes x,y is explored
+/*  Returns true if there is no left wall 
+ *  in orientation [orientation] at x,y, false otherwise
+ *  
+ *  Requires: x,y is explored
+ */
 bool canGoLeft(int x,int y,int orientation) {
   if(orientation == 0 && getWestWall(x,y) == 0) {
     return true;
@@ -233,7 +250,11 @@ bool canGoLeft(int x,int y,int orientation) {
   return false;
 }
 
-//assumes x,y is explored
+/*  Returns true if there is no right wall 
+ *  in orientation [orientation] at x,y, false otherwise
+ *  
+ *  Requires: x,y is explored
+ */
 bool canGoRight(int x,int y,int orientation) {
   if(orientation == 0 && getEastWall(x,y) == 0) {
     return true;
