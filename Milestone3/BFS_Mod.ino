@@ -171,10 +171,9 @@ void bfs_mod(int start_pos) {
 
 //add the moves from v to the stack
 void constructMovements(struct Node* v) {
- movementStack = new StackArray<char>();
  while (v != NULL) {
     char next_move = v->move;
-    movementStack->push(next_move);
+    movementStack.push(next_move);
     v = v->parent;
  }
   clearNodeQueue();//clearMemory

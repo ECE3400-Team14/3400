@@ -36,7 +36,7 @@ int orientation = 0; //0=north, 1=east, 2=south, 3=west
 int x = 1;
 int y = 2;
 
-StackArray<char>* movementStack;//stack of movements to follow
+StackArray<char> movementStack;//stack of movements to follow
 
 //robot settings
 bool debug = false;

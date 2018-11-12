@@ -5,8 +5,8 @@
 
 //once moves to next node have been created, run all of the moves in the movement stack
 void moveToNextUnexplored() {
-  while(!movementStack->isEmpty()) {
-    char move = movementStack->pop();
+  while(!movementStack.isEmpty()) {
+    char move = movementStack.pop();
     performAction(move);
   }
 }
