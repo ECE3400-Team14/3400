@@ -15,7 +15,7 @@ struct Node {
   struct Node* parent;//the parent of this node
 };
 
-QueueArray<Node*>* nodeQueue;//array of node (addresses)
+QueueArray<Node*>* nodeQueue;//array of node (addresses) (TODO: Make Priority Queue with LinkedList)
 
 void initNodeQueue() {
   nodeQueue = new QueueArray<Node*>;
@@ -26,8 +26,8 @@ void clearNodeQueue() {
  delete nodeQueue;
 }
 
-const int v_max_size = mazeSize;//(TODO: Calculate theoretical max size)
-struct Node visitedNodes[v_max_size*2];//array for storing node data
+const int v_max_size = (rowLength+1)*colLength;//(TODO: Calculate theoretical max size)
+struct Node visitedNodes[v_max_size];//array for storing node data 
 byte v_index = 0;//index where to enter new nodes
 
 /* 
@@ -50,8 +50,12 @@ void addVisitedNode(struct Node v) {
   }
 }
 
+/*
+ * Get address of node just added 
+ * Requires visitedNodes is not empty
+ */
 struct Node* getTopAddr() {
-  return &visitedNodes[v_index];
+  return &visitedNodes[v_index-1];
 }
 
 /*
@@ -93,9 +97,10 @@ void bfs_mod(int start_pos) {
   start.orientation = orientation;
   addVisitedNode(start);
   nodeQueue->push(getTopAddr());
-  
+
+  //search for the frontier
   while (!nodeQueue->isEmpty()) {
-    struct Node* v = nodeQueue->pop();
+    struct Node* v = nodeQueue->pop();//get next node to look at
     int pos = v->position;
     //if this node hasn't been explored yet, return path to node
     if(!isExplored(getX(pos),getY(pos) ) ){
@@ -104,14 +109,11 @@ void bfs_mod(int start_pos) {
     }
     //if the node is not in the frontier, keep looking
     else 
-//      if(!bfs_has_visited(pos)) {
-//        bfs_append_visited(pos);
-//      }
         //if forward is an option
         if(canGoForward(getX(pos),getY(pos),v->orientation)) {
-          int next_orientation = v->orientation;
-          int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);
-          if(!visitedContains(next_pos)) {//if next coordinate is not visited //!bfs_has_visited(next_pos)
+          int next_orientation = v->orientation;//orientation at destination
+          int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);//coordinate of destination
+          if(!visitedContains(next_pos)) {//if next coordinate is not visited 
             //add Node with next coordinate and 'f'
             struct Node next_v;
             next_v.position = next_pos;//update node position
@@ -120,14 +122,14 @@ void bfs_mod(int start_pos) {
             next_v.parent = v;
             //put next_v in visited array
             addVisitedNode(next_v);//store this node in memory
-            nodeQueue->push(getTopAddr());
+            nodeQueue->push(getTopAddr());//add address of node to queue
           }
           
         }
         //if left is an option (turn left with not wall)
         if(canGoLeft(getX(pos),getY(pos),v->orientation)) {
-          int next_orientation = (v->orientation == 0) ? 3 : v->orientation - 1;
-          int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);
+          int next_orientation = (v->orientation == 0) ? 3 : v->orientation - 1;//orientation after turning left
+          int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);//coordinate of front destination
           if(!visitedContains(next_pos)) {//if next coordinate is not visited
             //add Node with this coordinate and 'l'
             struct Node next_v;

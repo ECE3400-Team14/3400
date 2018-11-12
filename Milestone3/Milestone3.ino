@@ -27,9 +27,9 @@ bool fft_detect = false;//starting state of fft
 bool has_started = false;//false: wait for audio signal
 
 //maze data
-#define mazeSize 6
 #define rowLength 2
 #define colLength 3
+const int mazeSize = rowLength*colLength;
 
 //starting position
 int orientation = 0; //0=north, 1=east, 2=south, 3=west
