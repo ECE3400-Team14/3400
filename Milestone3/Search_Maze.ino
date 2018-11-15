@@ -9,6 +9,8 @@ void moveToNextUnexplored()
   while (!movementStack.isEmpty())
   {
     char move = movementStack.pop();
+    Serial.print("Move: ");
+    Serial.println(move);
     performAction(move);
   }
 }
@@ -25,36 +27,40 @@ void performAction(char m)
   //TODO: also have robot detection here(exit if there is a robot in the path)
   if (m == 'f')
   {
+    Serial.println("Going Forward");
     leaveIntersection();
     forwardAndStop();
     updateCoor();
   }
   else if (m == 'l')
   {
+    Serial.println("Going Left");
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
     //    forwardAndStop();
     //    updateCoor();
   }
-  else if (m = 'r')
+  else if (m == 'r')
   {
+    Serial.println("Going Right");
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation + 1);
     //    forwardAndStop();
     //    updateCoor();
   }
-  else if (m = 't')
+  else if (m == 't')
   {
+    Serial.println("Turning");
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-    forwardAndStop();
-    updateCoor();
+//    forwardAndStop();
+//    updateCoor();
   }
   else
   {
@@ -336,6 +342,27 @@ bool canGoRight(int x, int y, int orientation)
   return false;
 }
 
+bool canGoBackwards(int x, int y, int orientation)
+{
+  if (orientation == 0 && getSouthWall(x, y) == 0)
+  {
+    return true;
+  }
+  else if (orientation == 1 && getWestWall(x, y) == 0)
+  {
+    return true;
+  }
+  else if (orientation == 2 && getNorthWall(x, y) == 0)
+  {
+    return true;
+  }
+  else if (orientation == 3 && getEastWall(x, y) == 0)
+  {
+    return true;
+  }
+  return false;
+}
+
 //at x,y, facing [orientation], the next square coordinate
 int nextCoor(int x, int y, int orientation)
 {
@@ -349,11 +376,11 @@ int nextCoor(int x, int y, int orientation)
   else if (orientation == 1)
   {
     xn = x;
-    yn = (y == rowLength - 1) ? y : y + 1;
+    yn = (y == colLength - 1) ? y : y + 1;//changed
   }
   else if (orientation == 2)
   {
-    xn = (x == colLength - 1) ? x : x + 1;
+    xn = (x == rowLength - 1) ? x : x + 1;//changed
     yn = y;
   }
   else

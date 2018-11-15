@@ -14,7 +14,7 @@ int readForwardWallSensor() {
     val += analogRead(frontWallSensor);
   }
   val = val / 5;
-  if (val>120){
+  if (val>140){
     digitalWrite(frontWallLED, HIGH);
     return 1;
   }

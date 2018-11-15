@@ -1,3 +1,7 @@
+//robot settings
+const bool debug = false;
+const bool transmit = true;
+
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
  * 
@@ -20,7 +24,7 @@ int mux0 = 2;         //line sensor mux input 0
 int mux1 = 4;         //line sensor mux input 2
 int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
-int fft_cycle = 5;    //number of movement cycles between FFT detections (see forwardAndStop())
+int fft_cycle = 10;    //number of movement cycles between FFT detections (see forwardAndStop())
 int fft_mux_pin = 6;  //pin for selecting Audio/IR signal
 
 //fft settings
@@ -28,23 +32,19 @@ bool fft_detect = false;  //starting state of fft
 bool has_started = false; //false: wait for audio signal
 
 //maze data
-#define rowLength 2
-#define colLength 3
+#define rowLength 5//y
+#define colLength 4//x
 const int mazeSize = rowLength * colLength;
 
 //starting position
-#define start_orientation 0
-#define start_x 1
-#define start_y 2
+#define start_orientation 2
+#define start_x 0
+#define start_y 0
 int orientation = start_orientation; //0=north, 1=east, 2=south, 3=west
 int x = start_x;
 int y = start_y;
 
 StackArray<char> movementStack; //stack of movements to follow
-
-//robot settings
-const bool debug = false;
-const bool transmit = true;
 
 void setup()
 {
@@ -134,15 +134,15 @@ void loop()
 //    Serial.print("RW:");
 //    Serial.print(hasRightWall);
     updateMaze();
-    Serial.println("Left:");
-    Serial.println(canGoLeft(x,y,orientation));
-    Serial.println(" ");
-    Serial.println("FW:");
-    Serial.println(canGoForward(x,y,orientation));
-    Serial.println(" ");
-    Serial.println("Rigth:");
-    Serial.println(canGoRight(x,y,orientation));
-    Serial.println(" ");
+    Serial.print("Left:");
+    Serial.print(canGoLeft(x,y,orientation));
+    Serial.print(" ");
+    Serial.print("FW:");
+    Serial.print(canGoForward(x,y,orientation));
+    Serial.print(" ");
+    Serial.print("Rigth:");
+    Serial.print(canGoRight(x,y,orientation));
+    Serial.print(" ");
     
     //Serial.println();
     Serial.print(", ");

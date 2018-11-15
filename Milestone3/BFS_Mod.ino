@@ -112,6 +112,7 @@ void bfs_mod(int start_pos) {
     else 
         //if forward is an option
         if(canGoForward(getX(pos),getY(pos),v->orientation)) {
+          Serial.println("CanGoForward");
           int next_orientation = v->orientation;//orientation at destination
           int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);//coordinate of destination
           if(!visitedContains(next_pos)) {//if next coordinate is not visited 
@@ -129,6 +130,7 @@ void bfs_mod(int start_pos) {
         }
         //if left is an option (turn left with not wall)
         if(canGoLeft(getX(pos),getY(pos),v->orientation)) {
+          Serial.println("CanGoLeft");
           int next_orientation = (v->orientation == 0) ? 3 : v->orientation - 1;//orientation after turning left
           int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);//coordinate of front destination
           if(!visitedContains(next_pos)) {//if next coordinate is not visited
@@ -145,11 +147,13 @@ void bfs_mod(int start_pos) {
         }
 
         //if right is an option (turn right with not wall)
-        if(canGoRight(getX(pos),getY(pos),v->orientation)) {
+        if(canGoRight(getX(pos),getY(pos),v->orientation) ) {
+          Serial.println("CanGoRight");
           int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
           int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);
           if(!visitedContains(next_pos)) {//if next coordinate is not visited
             //add Node with this coordinate and 'r'
+            Serial.println("new node");
             struct Node next_v;
             next_v.position = pos;//keep the same position
             next_v.move = 'r';
@@ -160,6 +164,29 @@ void bfs_mod(int start_pos) {
             nodeQueue->push(getTopAddr());
           }
         }
+        //backwards
+        if(canGoBackwards(getX(pos),getY(pos),v->orientation)) {
+          Serial.println("CanGoBackwards");
+          int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
+          next_orientation = (next_orientation == 3) ? 0 : next_orientation + 1;
+          int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);
+          Serial.println("Data:");
+          Serial.println(next_orientation);
+          Serial.println(next_pos);
+          Serial.println(!visitedContains(next_pos));
+          if(!visitedContains(next_pos)) {//if next coordinate is not visited
+            //add Node with this coordinate and 'r'
+            struct Node next_v;
+            next_v.position = pos;//keep the same position
+            next_v.move = 't';
+            next_v.orientation = next_orientation;
+            next_v.parent = v;
+            //nodeQueue->push(next_v);
+            addVisitedNode(next_v);//store this node in memory
+            nodeQueue->push(getTopAddr());
+          }
+        }
+        
 
     
   }
@@ -176,7 +203,7 @@ void constructMovements(struct Node* v) {
     char next_move = v->move;
     Serial.print(next_move);//debug
     Serial.print(" to ");
-    Serial.println(getX(v->position));
+    Serial.print(getX(v->position));
     Serial.print(",");
     Serial.println(getY(v->position));
     movementStack.push(next_move);
