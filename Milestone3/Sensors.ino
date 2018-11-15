@@ -42,11 +42,11 @@ int readForwardWallSensor() {
 int readRightWallSensor() {
   //delay(5);
   int val = 0;
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 10; i++) {
     val += analogRead(rightWallSensor);
   }
-  val = val / 5;
-  if (val>150){
+  val = val / 10;
+  if (val>160){
     digitalWrite(rightWallLED, HIGH);
     return 1;
   }

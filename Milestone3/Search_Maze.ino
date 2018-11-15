@@ -21,8 +21,11 @@ void moveToNextUnexplored()
 //TODO: add Wall sensor/IR feedback to make sure we don't crash
 void performAction(char m)
 {
+  //TODO: if going to run into wall, return
+  //TODO: also have robot detection here(exit if there is a robot in the path)
   if (m == 'f')
   {
+    leaveIntersection();
     forwardAndStop();
     updateCoor();
   }
@@ -56,27 +59,6 @@ void performAction(char m)
   else
   {
     stopMovement();
-  }
-}
-
-//updates current coordinates of robot
-void updateCoor()
-{
-  if (orientation == 0)
-  {
-    x = (x == 0) ? 0 : x - 1;
-  }
-  else if (orientation == 1)
-  {
-    y += 1;
-  }
-  else if (orientation == 2)
-  {
-    x += 1;
-  }
-  else
-  {
-    y = (y == 0) ? 0 : y - 1;
   }
 }
 
@@ -382,42 +364,4 @@ int nextCoor(int x, int y, int orientation)
   return getPosition(xn, yn);
 }
 
-//using three wall sensors
-void updateMaze()
-{
-  //  turnLeft();
-  //  finishTurn();
-  //  orientation = (orientation-1)%4;
-  int hasFrontWall = readForwardWallSensor();
-  int hasRightWall = readRightWallSensor();
-  int hasLeftWall = readLeftWallSensor();
-  if (orientation == 0)
-  {
-    setNorthWall(x, y, hasFrontWall);
-    setEastWall(x, y, hasRightWall);
-    setWestWall(x, y, hasLeftWall);
-    //setWestWall(x,y,0);
-  }
-  else if (orientation == 1)
-  {
-    setEastWall(x, y, hasFrontWall);
-    setSouthWall(x, y, hasRightWall);
-    setNorthWall(x, y, hasLeftWall);
-    //setNorthWall(x,y,0);
-  }
-  else if (orientation == 2)
-  {
-    setSouthWall(x, y, hasFrontWall);
-    setWestWall(x, y, hasRightWall);
-    setEastWall(x, y, hasLeftWall);
-    //setEastWall(x,y,0);
-  }
-  else
-  {
-    setWestWall(x, y, hasFrontWall);
-    setNorthWall(x, y, hasRightWall);
-    setSouthWall(x, y, hasLeftWall);
-    //setSouthWall(x,y,0);
-  }
-  setExplored(x, y, 1);
-}
+

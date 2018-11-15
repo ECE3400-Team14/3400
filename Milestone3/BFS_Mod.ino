@@ -15,10 +15,11 @@ struct Node {
   struct Node* parent;//the parent of this node
 };
 
-QueueArray<Node*>* nodeQueue;//array of node (addresses) (TODO: Make Priority Queue with LinkedList)
+QueueList<Node*>* nodeQueue;//array of node (addresses) (TODO: Make Priority Queue with LinkedList)
 
 void initNodeQueue() {
-  nodeQueue = new QueueArray<Node*>;
+  nodeQueue = new QueueList<Node*>;
+//  nodeQueue.setPrinter(Serial);
 }
 
 //call when done with the tree (after generating path to next node)
@@ -165,7 +166,7 @@ void bfs_mod(int start_pos) {
   //do stuff to construct movement path
   
   //have found nothing new
-  constructMovements(&start);
+  constructMovements(&start);//is this necessary?
   return;
 }
 
@@ -173,6 +174,11 @@ void bfs_mod(int start_pos) {
 void constructMovements(struct Node* v) {
  while (v != NULL) {
     char next_move = v->move;
+    Serial.print(next_move);//debug
+    Serial.print(" to ");
+    Serial.println(getX(v->position));
+    Serial.print(",");
+    Serial.println(getY(v->position));
     movementStack.push(next_move);
     v = v->parent;
  }

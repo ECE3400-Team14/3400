@@ -43,16 +43,20 @@ int getY(int c) {return c/rowLength;}
 
 //need getter functions
 int getNorthWall(int x, int y){
-  return (mazeData[x+rowLength*y] &= 1<<8)>>8;
+//  return (mazeData[x+rowLength*y] &= 1<<8)>>8;
+  return bitRead(mazeData[x+rowLength*y],8);
   }
 int getEastWall(int x, int y){
-  return (mazeData[x+rowLength*y] &= 1<<9)>>9;
+//  return (mazeData[x+rowLength*y] &= 1<<9)>>9;
+  return bitRead(mazeData[x+rowLength*y],9);
   }
 int getSouthWall(int x, int y){
-  return (mazeData[x+rowLength*y] &= 1<<10)>>10;
+//  return (mazeData[x+rowLength*y] &= 1<<10)>>10;
+  return bitRead(mazeData[x+rowLength*y],10);
   }
 int getWestWall(int x, int y){
-  return (mazeData[x+rowLength*y] &= 1<<11)>>11;
+//  return (mazeData[x+rowLength*y] &= 1<<11)>>11;
+  return bitRead(mazeData[x+rowLength*y],11);
   }
 
 int isExplored(int x, int y) {

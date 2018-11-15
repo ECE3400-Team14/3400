@@ -1,4 +1,5 @@
 {
     "sketch": "Milestone3.ino",
-    "board": "arduino:avr:unowifi"
+    "board": "arduino:avr:unowifi",
+    "port": "/dev/cu.usbmodem1411"
 }

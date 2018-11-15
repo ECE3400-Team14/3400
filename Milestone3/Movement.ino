@@ -8,6 +8,14 @@
   while (readLeftSensor() == 1 || readRightSensor() == 1);//robot enters line again (both line sensors light)
   stopMovement();
 }
+
+  void leaveIntersection() {
+    forward();
+    while (readLeftmostSensor() == 0 || readRightmostSensor() == 0);
+    delay(40);
+    //stopMovement();
+  }
+
 void forwardUntilOffIntersection() {
   while (readLeftmostSensor() == 0 && readRightmostSensor() == 0){
     trackLine();
@@ -15,8 +23,11 @@ void forwardUntilOffIntersection() {
 }
 
 void forwardAndStop(){
+//    forward();
+//    delay(2);
     int i = 0;
     while (readLeftmostSensor() == 1 || readRightmostSensor() == 1){
+      
       //Serial.println("BEGIN");
       trackLine();
       //perform FFT every __ number of cycles
