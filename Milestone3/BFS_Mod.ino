@@ -5,9 +5,11 @@
  *    -see that a node there aready exists
  *    -compare path lengths from current path and the one of the node already there
  *    -if new path is lower, replace other node's parent with this node. 
+ *  -User priority node queue to order "frontier" by path length
  * 
  */
 
+//TODO: Condense data structure memory with byte sharing
 struct Node {
   byte position;//x,y coordinates of the node
   char move;//move used to get here
@@ -165,7 +167,7 @@ void bfs_mod(int start_pos) {
           }
         }
         //backwards
-        if(canGoBackwards(getX(pos),getY(pos),v->orientation)) {
+        if(canGoBackwards(getX(pos),getY(pos),v->orientation) && !canGoLeft(getX(pos),getY(pos),v->orientation) && !canGoRight(getX(pos),getY(pos),v->orientation) ) {
           Serial.println("CanGoBackwards");
           int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
           next_orientation = (next_orientation == 3) ? 0 : next_orientation + 1;
@@ -178,7 +180,7 @@ void bfs_mod(int start_pos) {
             //add Node with this coordinate and 'r'
             struct Node next_v;
             next_v.position = pos;//keep the same position
-            next_v.move = 't';
+            next_v.move = 'r';//made 'r' from 't' to preserve move priority heirarchy
             next_v.orientation = next_orientation;
             next_v.parent = v;
             //nodeQueue->push(next_v);
