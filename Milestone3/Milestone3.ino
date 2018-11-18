@@ -1,6 +1,6 @@
 //robot settings
 const bool debug = false;
-const bool transmit = true;
+const bool transmit = false;
 
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
@@ -9,6 +9,7 @@ const bool transmit = true;
  */
 #include <QueueArray.h>
 #include <QueueList.h>
+#include <LinkedList.h>
 #include <StackArray.h>
 #include <Servo.h>
 #include "printf.h"
@@ -32,8 +33,8 @@ bool fft_detect = false;  //starting state of fft
 bool has_started = false; //false: wait for audio signal
 
 //maze data
-#define rowLength 5//y
-#define colLength 4//x
+#define rowLength 2//y
+#define colLength 3//x
 const int mazeSize = rowLength * colLength;
 
 //starting position
