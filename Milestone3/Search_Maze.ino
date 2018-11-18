@@ -38,8 +38,8 @@ void performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-    //    forwardAndStop();
-    //    updateCoor();
+    forwardAndStop();
+    updateCoor();
   }
   else if (m == 'r')
   {
@@ -47,8 +47,8 @@ void performAction(char m)
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation + 1);
-    //    forwardAndStop();
-    //    updateCoor();
+    forwardAndStop();
+    updateCoor();
   }
   else if (m == 't')
   {
@@ -59,8 +59,8 @@ void performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-//    forwardAndStop();
-//    updateCoor();
+    forwardAndStop();
+    updateCoor();
   }
   else
   {
