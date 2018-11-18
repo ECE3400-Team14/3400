@@ -219,7 +219,9 @@ void bfs_mod(int start_pos) {
           //int next_orientation = v->orientation;//orientation at destination
           int next_orientation = getOrientation(v);
           int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);//coordinate of destination
-          if(!visitedContains(next_pos)) {//if next coordinate is not visited 
+          //if(!visitedContains(next_pos)) {//if next coordinate is not visited 
+          struct Node* check_v = getNodeByPos(next_pos);
+          if(check_v == NULL) {//if next coordinate is not visited 
             //add Node with next coordinate and 'f'
             struct Node next_v;
             next_v.position = next_pos;//update node position
@@ -248,7 +250,9 @@ void bfs_mod(int start_pos) {
           //int next_orientation = (v->orientation == 0) ? 3 : v->orientation - 1;//orientation after turning left
           int next_orientation = (getOrientation(v) == 0) ? 3 : getOrientation(v) - 1;//orientation after turning left
           int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);//coordinate of front destination
-          if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          struct Node* check_v = getNodeByPos(next_pos);
+          if(check_v == NULL) {//if next coordinate is not visited 
             //add Node with this coordinate and 'l'
             struct Node next_v;
             next_v.position = pos;//keep the same position
@@ -269,7 +273,9 @@ void bfs_mod(int start_pos) {
           //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
           int next_orientation = (getOrientation(v) == 3) ? 0 :getOrientation(v) + 1;
           int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);
-          if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          struct Node* check_v = getNodeByPos(next_pos);
+          if(check_v == NULL) {//if next coordinate is not visited 
             //add Node with this coordinate and 'r'
             Serial.println("new node");
             struct Node next_v;
@@ -288,21 +294,23 @@ void bfs_mod(int start_pos) {
         if(canGoBackwards(getX(pos),getY(pos),getOrientation(v)) && !canGoLeft(getX(pos),getY(pos),getOrientation(v)) && !canGoRight(getX(pos),getY(pos),getOrientation(v)) ) {
           Serial.println("CanGoBackwards");
           //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
-          int next_orientation = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
-          next_orientation = (next_orientation == 3) ? 0 : next_orientation + 1;
+          int next_orientation_r = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
+          int next_orientation = (next_orientation_r == 3) ? 0 : next_orientation_r + 1;
           int next_pos = nextCoor(getX(pos),getY(pos),next_orientation);
           Serial.println("Data:");
           Serial.println(next_orientation);
           Serial.println(next_pos);
           Serial.println(!visitedContains(next_pos));
-          if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          struct Node* check_v = getNodeByPos(next_pos);
+          if(check_v == NULL) {//if next coordinate is not visited 
             //add Node with this coordinate and 'r'
             struct Node next_v;
             next_v.position = pos;//keep the same position
             //next_v.move = 'r';//made 'r' from 't' to preserve move priority heirarchy
             setMove(&next_v, 'r');
             //next_v.orientation = next_orientation;
-            setOrientation(&next_v,next_orientation);
+            setOrientation(&next_v,next_orientation_r);
             next_v.parent = v;
             //nodeQueue->push(next_v);
             addVisitedNode(next_v);//store this node in memory
