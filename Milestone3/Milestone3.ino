@@ -15,14 +15,14 @@ const bool transmit = false;
 #include "printf.h"
 Servo left;
 Servo right;
-int buttonPin = 0;        //pin assigned to start button (NOT CURRENTLY IN USE)
+#define buttonPin 0       //pin assigned to start button (NOT CURRENTLY IN USE)
 int rightWallSensor = A5; //read right wall sensor data
-int rightWallLED = 7;     //TEMP
+int rightWallLED = 7;    //TEMP
 int frontWallSensor = A4;
 int leftWallSensor = A1;
 int frontWallLED = 8;
-int mux0 = 2;         //line sensor mux input 0
-int mux1 = 4;         //line sensor mux input 2
+#define mux0 2         //line sensor mux input 0
+#define mux1 4         //line sensor mux input 2
 int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
 int fft_cycle = 10;   //number of movement cycles between FFT detections (see forwardAndStop())
@@ -37,15 +37,18 @@ bool has_started = false; //false: wait for audio signal
 #define rowLength 4 //y
 #define colLength 4 //x
 
-const int mazeSize = rowLength * colLength;
+const byte mazeSize = rowLength * colLength;
 
 //starting position
 #define start_orientation 2
 #define start_x 0
 #define start_y 0
-int orientation = start_orientation; //0=north, 1=east, 2=south, 3=west
-int x = start_x;
-int y = start_y;
+byte orientation = start_orientation; //0=north, 1=east, 2=south, 3=west
+byte x = start_x;
+byte y = start_y;
+
+byte prev_x = -1;//previous x coordinate (-1 default)
+byte prev_y = -1;//previous y coordinate (-1 by default)
 
 StackArray<char> movementStack; //stack of movements to follow
 
@@ -292,12 +295,21 @@ void updateMaze()
 void dijkstra_search()
 {
   updateMaze(); //analyze walls, set square as explored
-  if (transmit)
+  if (transmit && hasMoved())
   {
     sendMaze();
   }                           //send new maze data
   dijkstra(getPosition(x, y)); //find the closest frontier square and create a path to it
-  moveToNextUnexplored();     //perform set of actions gererated by bfs_mod
+  moveToNextUnexplored();     //perform set of actions gererated by dijkstra
+}
+
+/*
+ * Returns true if the robot has moved from its previous location since the last search, or if no previous move is recorded, 
+ * false otherwise.
+ */
+bool hasMoved() {
+  if(x != prev_x || y != prev_y) return true;
+  else false;
 }
 
 /* (UNIMPLEMENTED) A basic DFS/BFS search algorith*/

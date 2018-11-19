@@ -6,6 +6,9 @@
 //once moves to next node have been created, run all of the moves in the movement stack
 void moveToNextUnexplored()
 {
+  //set previous coordinates to current coordinates before move
+  prev_x = x;
+  prev_y = y;
   while (!movementStack.isEmpty())
   {
     char move = movementStack.pop();
