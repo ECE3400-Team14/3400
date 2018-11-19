@@ -25,7 +25,7 @@ int mux0 = 2;         //line sensor mux input 0
 int mux1 = 4;         //line sensor mux input 2
 int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
-int fft_cycle = 10;    //number of movement cycles between FFT detections (see forwardAndStop())
+int fft_cycle = 10;   //number of movement cycles between FFT detections (see forwardAndStop())
 int fft_mux_pin = 6;  //pin for selecting Audio/IR signal
 
 //fft settings
@@ -34,8 +34,8 @@ bool has_started = false; //false: wait for audio signal
 
 //maze data
 
-#define rowLength 4//y
-#define colLength 4//x
+#define rowLength 4 //y
+#define colLength 4 //x
 
 const int mazeSize = rowLength * colLength;
 
@@ -55,10 +55,10 @@ void setup()
   right.attach(3); //right servo pin 3
   stopMovement();
   Serial.begin(9600);
-//  if (debug)
-//  {
-//    
-//  } //TEST that this works without Serial.begin, test D0 and D1
+  //  if (debug)
+  //  {
+  //
+  //  } //TEST that this works without Serial.begin, test D0 and D1
   pinMode(buttonPin, INPUT);
   pinMode(rightWallSensor, INPUT);
   pinMode(frontWallSensor, INPUT);
@@ -125,28 +125,28 @@ void loop()
     Serial.print("RR:");
     Serial.print(rightmost);
     Serial.print("|");
-//    int hasRightWall = readRightWallSensor();
-//    int hasFrontWall = readForwardWallSensor();
-//    int hasLeftWall = readLeftWallSensor();
-//    Serial.print("LW:");
-//    Serial.print(hasLeftWall);
-//    Serial.print(" ");
-//    Serial.print("FW:");
-//    Serial.print(hasFrontWall);
-//    Serial.print(" ");
-//    Serial.print("RW:");
-//    Serial.print(hasRightWall);
+    //    int hasRightWall = readRightWallSensor();
+    //    int hasFrontWall = readForwardWallSensor();
+    //    int hasLeftWall = readLeftWallSensor();
+    //    Serial.print("LW:");
+    //    Serial.print(hasLeftWall);
+    //    Serial.print(" ");
+    //    Serial.print("FW:");
+    //    Serial.print(hasFrontWall);
+    //    Serial.print(" ");
+    //    Serial.print("RW:");
+    //    Serial.print(hasRightWall);
     updateMaze();
     Serial.print("Left:");
-    Serial.print(canGoLeft(x,y,orientation));
+    Serial.print(canGoLeft(x, y, orientation));
     Serial.print(" ");
     Serial.print("FW:");
-    Serial.print(canGoForward(x,y,orientation));
+    Serial.print(canGoForward(x, y, orientation));
     Serial.print(" ");
     Serial.print("Rigth:");
-    Serial.print(canGoRight(x,y,orientation));
+    Serial.print(canGoRight(x, y, orientation));
     Serial.print(" ");
-    
+
     //Serial.println();
     Serial.print(", ");
     fft_analyze();
@@ -246,14 +246,16 @@ void updateMaze()
     setEastWall(x, y, hasRightWall);
     setWestWall(x, y, hasLeftWall);
     //robot starts with wall behind it
-    if(x == start_x && y == start_y) setSouthWall(x,y,1);
+    if (x == start_x && y == start_y)
+      setSouthWall(x, y, 1);
   }
   else if (orientation == 1)
   {
     setEastWall(x, y, hasFrontWall);
     setSouthWall(x, y, hasRightWall);
     setNorthWall(x, y, hasLeftWall);
-    if(x == start_x && y == start_y) setWestWall(x,y,1);//robot starts with wall behind it
+    if (x == start_x && y == start_y)
+      setWestWall(x, y, 1); //robot starts with wall behind it
     //setWestWall(x,y,0);
   }
   else if (orientation == 2)
@@ -262,7 +264,8 @@ void updateMaze()
     setWestWall(x, y, hasRightWall);
     setEastWall(x, y, hasLeftWall);
     //setNorthWall(x,y,0);
-    if(x == start_x && y == start_y) setNorthWall(x,y,1);//robot starts with wall behind it
+    if (x == start_x && y == start_y)
+      setNorthWall(x, y, 1); //robot starts with wall behind it
   }
   else
   {
@@ -270,7 +273,8 @@ void updateMaze()
     setNorthWall(x, y, hasRightWall);
     setSouthWall(x, y, hasLeftWall);
     //setEastWall(x,y,0);
-    if(x == start_x && y == start_y) setEastWall(x,y,1);//robot starts with wall behind it
+    if (x == start_x && y == start_y)
+      setEastWall(x, y, 1); //robot starts with wall behind it
   }
   setExplored(x, y, 1);
 }
@@ -287,8 +291,11 @@ void updateMaze()
  */
 void bfs_mod_search()
 {
-  updateMaze();               //analyze walls, set square as explored
-  if (transmit) { sendMaze();}//send new maze data
+  updateMaze(); //analyze walls, set square as explored
+  if (transmit)
+  {
+    sendMaze();
+  }                           //send new maze data
   bfs_mod(getPosition(x, y)); //find the closest frontier square and create a path to it
   moveToNextUnexplored();     //perform set of actions gererated by bfs_mod
 }
