@@ -13,7 +13,7 @@ struct Node
   //byte orientation;//orientation of the robot at this point
   byte move_and_or;    //[XXXMMMOO]
   struct Node *parent; //the parent of this node
-  int dist;            //distance from start to [position]
+  unsigned int dist;   //distance from start to [position]
 };
 
 void setMove(struct Node *v, char m)
