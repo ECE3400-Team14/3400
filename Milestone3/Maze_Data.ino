@@ -2,35 +2,36 @@
  * Functions for storing, setting, and getting maze data
  */
 
-unsigned int mazeData[mazeSize];//index = x + rowLength*y, 0,0 bottom left, 2*3 for now
-//const int rowLength = 2;
-//const int colLength = 3;
+byte mazeData[mazeSize]; //index = x + rowLength*y
 
 /*
- * x[3:0]
- * y[7:4]
- * N[8]
- * E[9]
- * S[10]
- * W[11]
- * color[12]
- * shape[14:13]
- * explored[15]
+ * N[0]
+ * E[1]
+ * S[2]
+ * W[3]
+ * color[4]
+ * shape[5:6]
+ * explored[7]
  */
-void initMaze(){
-  for (int xn = 0; xn < rowLength; xn++){
-    for (int yn = 0; yn < colLength; yn++){
+
+//not necessary (DEPRICATED)
+void initMaze()
+{
+  for (int xn = 0; xn < rowLength; xn++)
+  {
+    for (int yn = 0; yn < colLength; yn++)
+    {
       int coordinates = 0;
       coordinates = coordinates | (xn | (yn << 4));
-      mazeData[xn+rowLength*yn] = coordinates;
-      }
+      mazeData[xn + rowLength * yn] = coordinates;
     }
   }
+}
 
-int getPosition(int x, int y) { return x+rowLength*y;}
+int getPosition(int x, int y) { return x + rowLength * y; }
 
-int getX(int c) {return c%rowLength;}
-int getY(int c) {return c/rowLength;}
+int getX(int c) { return c % rowLength; }
+int getY(int c) { return c / rowLength; }
 
 //returns true if there is a known wall between (x1,y1) and (x2,y2)
 //Requres (x1,y1) and (x2,y2) are one square apart
@@ -42,59 +43,76 @@ int getY(int c) {return c/rowLength;}
 //}
 
 //need getter functions
-int getNorthWall(int x, int y){
-//  return (mazeData[x+rowLength*y] &= 1<<8)>>8;
-  return bitRead(mazeData[x+rowLength*y],8);
-  }
-int getEastWall(int x, int y){
-//  return (mazeData[x+rowLength*y] &= 1<<9)>>9;
-  return bitRead(mazeData[x+rowLength*y],9);
-  }
-int getSouthWall(int x, int y){
-//  return (mazeData[x+rowLength*y] &= 1<<10)>>10;
-  return bitRead(mazeData[x+rowLength*y],10);
-  }
-int getWestWall(int x, int y){
-//  return (mazeData[x+rowLength*y] &= 1<<11)>>11;
-  return bitRead(mazeData[x+rowLength*y],11);
-  }
-
-int isExplored(int x, int y) {
-  return bitRead(mazeData[x+rowLength*y], 15);
+int getNorthWall(int x, int y)
+{
+  return bitRead(mazeData[x + rowLength * y], 0);
+}
+int getEastWall(int x, int y)
+{
+  return bitRead(mazeData[x + rowLength * y], 1);
+}
+int getSouthWall(int x, int y)
+{
+  return bitRead(mazeData[x + rowLength * y], 2);
+}
+int getWestWall(int x, int y)
+{
+  return bitRead(mazeData[x + rowLength * y], 3);
 }
 
-void setNorthWall(int x, int y, int valid){
-  if(valid) bitSet(mazeData[x+rowLength*y], 8);
-  else bitClear(mazeData[x+rowLength*y], 8);
-  }
-void setEastWall(int x, int y, int valid){
-  if(valid) bitSet(mazeData[x+rowLength*y], 9);
-  else bitClear(mazeData[x+rowLength*y], 9);
-  
-  }
-void setSouthWall(int x, int y, int valid){
-  if(valid) bitSet(mazeData[x+rowLength*y], 10);
-  else {bitClear(mazeData[x+rowLength*y], 10);}
-  
-  }
-void setWestWall(int x, int y, int valid){
-  if(valid) bitSet(mazeData[x+rowLength*y], 11);
-  else bitClear(mazeData[x+rowLength*y], 11);
-  
-  }
-  //0 is red, 1 is blue
-void setTreasureColor(int x, int y, int color){
-  if(color) bitSet(mazeData[x+rowLength*y], 12);
-  else bitClear(mazeData[x+rowLength*y], 12);
-  }
-  // shape according to standard
-void setTreasureShape(int x, int y, int shape){
-  mazeData[x+rowLength*y] |= shape << 13;
-  }
-
-void setExplored(int x, int y, int valid) {
-  if(valid) bitSet(mazeData[x+rowLength*y], 15);
-  else bitClear(mazeData[x+rowLength*y], 15);
+int isExplored(int x, int y)
+{
+  return bitRead(mazeData[x + rowLength * y], 7);
 }
 
+void setNorthWall(int x, int y, int valid)
+{
+  if (valid)
+    bitSet(mazeData[x + rowLength * y], 0);
+  else
+    bitClear(mazeData[x + rowLength * y], 0);
+}
+void setEastWall(int x, int y, int valid)
+{
+  if (valid)
+    bitSet(mazeData[x + rowLength * y], 1);
+  else
+    bitClear(mazeData[x + rowLength * y], 1);
+}
+void setSouthWall(int x, int y, int valid)
+{
+  if (valid)
+    bitSet(mazeData[x + rowLength * y], 2);
+  else
+  {
+    bitClear(mazeData[x + rowLength * y], 2);
+  }
+}
+void setWestWall(int x, int y, int valid)
+{
+  if (valid)
+    bitSet(mazeData[x + rowLength * y], 3);
+  else
+    bitClear(mazeData[x + rowLength * y], 3);
+}
+//0 is red, 1 is blue
+void setTreasureColor(int x, int y, int color)
+{
+  if (color)
+    bitSet(mazeData[x + rowLength * y], 4);
+  else
+    bitClear(mazeData[x + rowLength * y], 4);
+}
+// shape according to standard
+void setTreasureShape(int x, int y, int shape)
+{
+  mazeData[x + rowLength * y] |= shape << 5;
+}
 
+void setExplored(int x, int y, int valid)
+{
+  if (valid)
+    bitSet(mazeData[x + rowLength * y], 7);
+  else
+    bitClear(mazeData[x + rowLength * y], 7);
+}

@@ -88,7 +88,7 @@ void setup()
   }
   digitalWrite(fft_mux_pin, HIGH);
 
-  initMaze();
+  //initMaze(); (removed to save memory)
   printf_begin();
   radioSetup();
 

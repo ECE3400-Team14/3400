@@ -236,6 +236,7 @@ void bfs_mod(int start_pos)
     //if this node hasn't been explored yet, return path to node
     if (!isExplored(getX(pos), getY(pos)))
     {
+      clearQueue(); //clear frontier memory
       constructMovements(v);
       return;
     }
@@ -422,5 +423,4 @@ void constructMovements(struct Node *v)
     movementStack.push(next_move);
     v = v->parent;
   }
-  clearQueue(); //clearMemory
 }

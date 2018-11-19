@@ -26,13 +26,13 @@
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
-RF24 radio(9,10);
+RF24 radio(9, 10);
 //
 // Topology
 //
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0x0000000028LL, 0x0000000029LL };
+const uint64_t pipes[2] = {0x0000000028LL, 0x0000000029LL};
 //
 // Role management
 //
@@ -40,11 +40,17 @@ const uint64_t pipes[2] = { 0x0000000028LL, 0x0000000029LL };
 // in this system.  Doing so greatly simplifies testing.
 //
 
+unsigned int data; //data to be sent by radio
+
 // The various roles supported by this sketch
-typedef enum { role_ping_out = 1, role_pong_back } role_e;
+typedef enum
+{
+  role_ping_out = 1,
+  role_pong_back
+} role_e;
 
 // The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
+const char *role_friendly_name[] = {"invalid", "Ping out", "Pong back"};
 
 // The role of the current running sketch
 role_e role = role_ping_out;
@@ -60,7 +66,7 @@ void radioSetup(void)
   radio.begin();
 
   // optionally, increase the delay between retries & # of retries
-  radio.setRetries(15,15);
+  radio.setRetries(15, 15);
   radio.setAutoAck(true);
   // set the channel
   radio.setChannel(0x50);
@@ -84,8 +90,8 @@ void radioSetup(void)
   // Open the 'other' pipe for reading, in position #1 (we can have up to 5 pipes open for reading)
 
   radio.openWritingPipe(pipes[0]);
-  radio.openReadingPipe(1,pipes[1]);
-  
+  radio.openReadingPipe(1, pipes[1]);
+
   //
   // Start listening
   //
@@ -93,12 +99,15 @@ void radioSetup(void)
   radio.startListening();
 }
 
-void sendMaze(){
+void sendMaze()
+{
   // First, stop listening so we can talk.
   radio.stopListening();
   // Take the time, and send it.  This will block until complete
   //Serial.println(mazeData[x+rowLength*y]);
-  bool ok = radio.write( mazeData+x+rowLength*y, sizeof(unsigned int) );
+  data = (mazeData[x + rowLength * y] << 8) | (y << 4) | x; //construct data
+  //bool ok = radio.write( mazeData+x+rowLength*y, sizeof(unsigned int) );
+  bool ok = radio.write(&data, sizeof(unsigned int));
   if (ok)
     Serial.println("ok...");
   else
@@ -110,12 +119,12 @@ void sendMaze(){
   // Wait here until we get a response, or timeout (250ms)
   unsigned long started_waiting_at = millis();
   bool timeout = false;
-  while ( ! radio.available() && ! timeout )
-    if (millis() - started_waiting_at > 100 )
+  while (!radio.available() && !timeout)
+    if (millis() - started_waiting_at > 100)
       timeout = true;
 
   // if timed out, resend
-  if ( timeout )
+  if (timeout)
   {
     Serial.print("Failed, response timed out.\n\r");
     //sendMaze();
