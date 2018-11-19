@@ -2,7 +2,7 @@
  *  does dijkstra's algorithm
 */
 
-#define forward_dist 3 //distance weight of forward
+#define forward_dist 2 //distance weight of forward
 #define turn_dist 1    //distance weight of turn
 
 //TODO: Condense data structure memory with byte sharing
@@ -13,7 +13,7 @@ struct Node
   //byte orientation;//orientation of the robot at this point
   byte move_and_or;    //[XXXMMMOO]
   struct Node *parent; //the parent of this node
-  unsigned int dist;   //distance from start to [position]
+  byte dist;   //distance from start to [position]
 };
 
 void setMove(struct Node *v, char m)

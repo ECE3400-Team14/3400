@@ -12,7 +12,7 @@
   void leaveIntersection() {
     forward();
     while (readLeftmostSensor() == 0 || readRightmostSensor() == 0);
-    delay(40);
+    delay(20);//changed
     //stopMovement();
   }
 

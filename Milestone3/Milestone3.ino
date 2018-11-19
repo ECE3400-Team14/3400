@@ -1,14 +1,14 @@
 //robot settings
 const bool debug = false;
-const bool transmit = false;
+const bool transmit = true;
 
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
  * 
  * Written by: David Burgstahler (dfb93), Gregory Kaiser (ghk48), Andrew Lin (yl656), and Michaelangelo Rodriguez Ayala (mr2242)
  */
-#include <QueueArray.h>
-#include <QueueList.h>
+//#include <QueueArray.h>
+//#include <QueueList.h>
 #include <LinkedList.h>
 #include <StackArray.h>
 #include <Servo.h>
@@ -34,7 +34,7 @@ bool has_started = false; //false: wait for audio signal
 
 //maze data
 
-#define rowLength 4 //y
+#define rowLength 5 //y
 #define colLength 4 //x
 
 const byte mazeSize = rowLength * colLength;
@@ -155,17 +155,17 @@ void loop()
     fft_analyze();
     Serial.println();
     //orientation code:
-    //   updateCoor();
-    //   Serial.print("Orientation:");
-    //   Serial.println(orientation);
-    //   Serial.print(x);
-    //   Serial.print(", ");
-    //   Serial.print(y);
-    //   Serial.println();
-    //   orientation = (orientation == 0) ? 3 : orientation - 1;
-    //   updateMaze();
-    //   sendMaze();
-    //   delay(1000);
+//       updateCoor();
+//       Serial.print("Orientation:");
+//       Serial.println(orientation);
+//       Serial.print(x);
+//       Serial.print(", ");
+//       Serial.print(y);
+//       Serial.println();
+//       orientation = (orientation == 0) ? 3 : orientation - 1;
+//       updateMaze();
+//       sendMaze();
+//       delay(1000);
   }
 }
 
