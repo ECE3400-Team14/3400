@@ -33,8 +33,10 @@ bool fft_detect = false;  //starting state of fft
 bool has_started = false; //false: wait for audio signal
 
 //maze data
-#define rowLength 2//y
-#define colLength 3//x
+
+#define rowLength 4//y
+#define colLength 4//x
+
 const int mazeSize = rowLength * colLength;
 
 //starting position

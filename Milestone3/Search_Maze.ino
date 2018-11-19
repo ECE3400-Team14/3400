@@ -38,8 +38,8 @@ void performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-    //    forwardAndStop();
-    //    updateCoor();
+    forwardAndStop();
+    updateCoor();
   }
   else if (m == 'r')
   {
@@ -47,8 +47,8 @@ void performAction(char m)
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation + 1);
-    //    forwardAndStop();
-    //    updateCoor();
+    forwardAndStop();
+    updateCoor();
   }
   else if (m == 't')
   {
@@ -59,8 +59,8 @@ void performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-//    forwardAndStop();
-//    updateCoor();
+    forwardAndStop();
+    updateCoor();
   }
   else
   {
@@ -376,11 +376,11 @@ int nextCoor(int x, int y, int orientation)
   else if (orientation == 1)
   {
     xn = x;
-    yn = (y == colLength - 1) ? y : y + 1;//changed
+    yn = (y == colLength - 1) ? y : y + 1; //changed
   }
   else if (orientation == 2)
   {
-    xn = (x == rowLength - 1) ? x : x + 1;//changed
+    xn = (x == rowLength - 1) ? x : x + 1; //changed
     yn = y;
   }
   else
@@ -390,5 +390,3 @@ int nextCoor(int x, int y, int orientation)
   }
   return getPosition(xn, yn);
 }
-
-
