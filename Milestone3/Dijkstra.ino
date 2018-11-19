@@ -210,7 +210,7 @@ Node *getNodeByPos(byte pos)
  *                      Q.push(w)
  * 
 */
-void bfs_mod(int start_pos)
+void dijkstra(int start_pos)
 {
 
   initQueue();        //initialize the queue

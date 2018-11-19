@@ -103,7 +103,7 @@ void loop()
   {
     //search();
     //rightWallFollowing();
-    bfs_mod_search();
+    dijkstra_search();
   }
   //debug
   else
@@ -289,14 +289,14 @@ void updateMaze()
  * through the explored squares and executes this path
  * 
  */
-void bfs_mod_search()
+void dijkstra_search()
 {
   updateMaze(); //analyze walls, set square as explored
   if (transmit)
   {
     sendMaze();
   }                           //send new maze data
-  bfs_mod(getPosition(x, y)); //find the closest frontier square and create a path to it
+  dijkstra(getPosition(x, y)); //find the closest frontier square and create a path to it
   moveToNextUnexplored();     //perform set of actions gererated by bfs_mod
 }
 
