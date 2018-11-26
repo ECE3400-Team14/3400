@@ -1,6 +1,6 @@
 //robot settings
 const bool debug = false;
-const bool transmit = true;
+const bool transmit = false;
 
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
@@ -89,7 +89,7 @@ void setup()
   while (has_started == false)
   {
     fft_analyze();
-    if (debug) Serial.println("Waiting");
+    Serial.println("Waiting");
   }
   digitalWrite(fft_mux_pin, HIGH);
 
@@ -115,33 +115,33 @@ void loop()
   else
   {
     // troubleshooting code block:
-//    int leftmost = readLeftmostSensor();
-//    Serial.print("LL:");
-//    Serial.print(leftmost);
-//    Serial.print("|");
-//    int left = readLeftSensor();
-//    Serial.print("L:");
-//    Serial.print(left);
-//    Serial.print("|");
-//    int right = readRightSensor();
-//    Serial.print("R:");
-//    Serial.print(right);
-//    Serial.print("|");
-//    int rightmost = readRightmostSensor();
-//    Serial.print("RR:");
-//    Serial.print(rightmost);
-//    Serial.print("|");
-//    //    int hasRightWall = readRightWallSensor();
-//    //    int hasFrontWall = readForwardWallSensor();
-//    //    int hasLeftWall = readLeftWallSensor();
-//    //    Serial.print("LW:");
-//    //    Serial.print(hasLeftWall);
-//    //    Serial.print(" ");
-//    //    Serial.print("FW:");
-//    //    Serial.print(hasFrontWall);
-//    //    Serial.print(" ");
-//    //    Serial.print("RW:");
-//    //    Serial.print(hasRightWall);
+    int leftmost = readLeftmostSensor();
+    Serial.print("LL:");
+    Serial.print(leftmost);
+    Serial.print("|");
+    int left = readLeftSensor();
+    Serial.print("L:");
+    Serial.print(left);
+    Serial.print("|");
+    int right = readRightSensor();
+    Serial.print("R:");
+    Serial.print(right);
+    Serial.print("|");
+    int rightmost = readRightmostSensor();
+    Serial.print("RR:");
+    Serial.print(rightmost);
+    Serial.print("|");
+        int hasRightWall = readRightWallSensor();
+        int hasFrontWall = readForwardWallSensor();
+        int hasLeftWall = readLeftWallSensor();
+        Serial.print("LW:");
+        Serial.print(hasLeftWall);
+        Serial.print(" ");
+        Serial.print("FW:");
+        Serial.print(hasFrontWall);
+        Serial.print(" ");
+        Serial.print("RW:");
+        Serial.print(hasRightWall);
 //    updateMaze();
 //    Serial.print("Left:");
 //    Serial.print(canGoLeft(x, y, orientation));
@@ -152,23 +152,23 @@ void loop()
 //    Serial.print("Rigth:");
 //    Serial.print(canGoRight(x, y, orientation));
 //    Serial.print(" ");
-//
-//    //Serial.println();
-//    Serial.print(", ");
-//    fft_analyze();
-//    Serial.println();
+
+    //Serial.println();
+    Serial.print(", ");
+    fft_analyze();
+    Serial.println();
     //orientation code:
-       updateCoor();
-       Serial.print("Orientation:");
-       Serial.println(orientation);
-       Serial.print(x);
-       Serial.print(", ");
-       Serial.print(y);
-       Serial.println();
-       orientation = (orientation == 0) ? 3 : orientation - 1;
-       updateMaze();
-       sendMaze();
-       delay(1000);
+//       updateCoor();
+//       Serial.print("Orientation:");
+//       Serial.println(orientation);
+//       Serial.print(x);
+//       Serial.print(", ");
+//       Serial.print(y);
+//       Serial.println();
+//       orientation = (orientation == 0) ? 3 : orientation - 1;
+//       updateMaze();
+//       sendMaze();
+//       delay(1000);
   }
 }
 
@@ -219,6 +219,10 @@ void rightWallFollowing()
 //updates current coordinates of robot
 void updateCoor()
 {
+  //store old coordinates
+  prev_x = x;
+  prev_y = y;
+  
   if (orientation == 0)
   {
     x = (x == 0) ? 0 : x - 1;
@@ -248,13 +252,13 @@ void updateMaze()
   int hasLeftWall = readLeftWallSensor();
 
   //ROBOT DETECTION
-  fft_analyze();
-  if(fft_detect) {
-    robot_coordinates = nextCoor(x,y,orientation);//set robot in forward square
-  }
-  else {
-    robot_coordinates = -1;//clear the robot
-  }
+//  fft_analyze();
+//  if(fft_detect) {
+//    robot_coordinates = nextCoor(x,y,orientation);//set robot in forward square
+//  }
+//  else {
+//    robot_coordinates = -1;//clear the robot
+//  }
 
   
   if (orientation == 0)
@@ -305,7 +309,9 @@ void updateMaze()
  * from all visited squares. 
  * 
  * Once this square is found, it generates the path requiring the fewest movements (1 movement = move between squares or a turn)
- * through the explored squares and executes this path
+ * through the explored squares and executes this path.
+ * 
+ * If a path is blocked by a robot, the robot will abort its movement and exit this function
  * 
  */
 void dijkstra_search()

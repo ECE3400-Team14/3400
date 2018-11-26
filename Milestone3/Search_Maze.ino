@@ -7,18 +7,17 @@
 void moveToNextUnexplored()
 {
   //set previous coordinates to current coordinates before move
-  prev_x = x;
-  prev_y = y;
   bool can_move = true;
   while (!movementStack.isEmpty())
   {
     char move = movementStack.pop();
 //    Serial.print("Move: ");
 //    Serial.println(move);
-    if(can_move && performAction(move) == 0) {
-      //abort: clear the movement stack without moving
-      move = false;
-    }
+//    if(can_move && performAction(move) == 0) {
+//      //abort: clear the movement stack without moving
+//      move = false;
+//    }
+    performAction(move);
   }
 }
 
