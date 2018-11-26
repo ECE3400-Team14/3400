@@ -242,8 +242,8 @@ void dijkstra(int start_pos)
     }
     //if the node is not in the frontier, keep looking
     else
-        //if forward is an option
-        if (canGoForward(getX(pos), getY(pos), getOrientation(v)))
+    //if forward is an option
+    if (canGoForward(getX(pos), getY(pos), getOrientation(v)))
     {
       //Serial.println("CanGoForward");
       int next_orientation = getOrientation(v);

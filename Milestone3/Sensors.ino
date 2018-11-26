@@ -3,6 +3,13 @@
  * 
  */
 
+/*
+ * Returns true if there is immediate forward danger (wall or robot), false otherwise
+ */
+bool checkForObstacle() {
+  fft_analyze();
+  return (fft_detect || readForwardWallSensor() == 1);
+}
 
 /* read forward-facing sensor
  * Returns 1 for wall detected and 0 for no wall detected

@@ -9,12 +9,16 @@ void moveToNextUnexplored()
   //set previous coordinates to current coordinates before move
   prev_x = x;
   prev_y = y;
+  bool can_move = true;
   while (!movementStack.isEmpty())
   {
     char move = movementStack.pop();
 //    Serial.print("Move: ");
 //    Serial.println(move);
-    performAction(move);
+    if(can_move && performAction(move) == 0) {
+      //abort: clear the movement stack without moving
+      move = false;
+    }
   }
 }
 
@@ -23,17 +27,21 @@ void moveToNextUnexplored()
 //r: turn right
 //t: turn 180 deg. and forward (don't use)
 //s: stop
-//TODO: add Wall sensor/IR feedback to make sure we don't crash
-void performAction(char m)
+//returns 1 if action was performed. returns 0 if the action was aborted
+byte performAction(char m)
 {
   //TODO: if going to run into wall, return
   //TODO: also have robot detection here(exit if there is a robot in the path)
   if (m == 'f')
   {
     //Serial.println("Going Forward");
+    //check for robot/obstacle
+    if(checkForObstacle()) return 0;
+    
     leaveIntersection();
     forwardAndStop();
     updateCoor();
+    return 1;
   }
   else if (m == 'l')
   {
@@ -41,8 +49,11 @@ void performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
+    //check for robot/obstacle
+    if(checkForObstacle()) return 0;
     forwardAndStop();
     updateCoor();
+    return 1;
   }
   else if (m == 'r')
   {
@@ -50,8 +61,11 @@ void performAction(char m)
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation + 1);
+    //check for robot/obstacle
+    if(checkForObstacle()) return 0;
     forwardAndStop();
     updateCoor();
+    return 1;
   }
   else if (m == 't')
   {
@@ -62,12 +76,16 @@ void performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
+    //check for robot/obstacle
+    if(checkForObstacle()) return 0;
     forwardAndStop();
     updateCoor();
+    return 1;
   }
   else
   {
     stopMovement();
+    return 1;
   }
 }
 
@@ -274,19 +292,19 @@ char get_next_move(int x, int y, int new_x, int new_y, int orientation)
  */
 bool canGoForward(int x, int y, int orientation)
 {
-  if (orientation == 0 && getNorthWall(x, y) == 0)
+  if (orientation == 0 && getNorthWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 1 && getEastWall(x, y) == 0)
+  else if (orientation == 1 && getEastWall(x, y) == 0 && noRobot(x,y,orientation) )
   {
     return true;
   }
-  else if (orientation == 2 && getSouthWall(x, y) == 0)
+  else if (orientation == 2 && getSouthWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 3 && getWestWall(x, y) == 0)
+  else if (orientation == 3 && getWestWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
@@ -300,19 +318,19 @@ bool canGoForward(int x, int y, int orientation)
  */
 bool canGoLeft(int x, int y, int orientation)
 {
-  if (orientation == 0 && getWestWall(x, y) == 0)
+  if (orientation == 0 && getWestWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 1 && getNorthWall(x, y) == 0)
+  else if (orientation == 1 && getNorthWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 2 && getEastWall(x, y) == 0)
+  else if (orientation == 2 && getEastWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 3 && getSouthWall(x, y) == 0)
+  else if (orientation == 3 && getSouthWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
@@ -326,19 +344,19 @@ bool canGoLeft(int x, int y, int orientation)
  */
 bool canGoRight(int x, int y, int orientation)
 {
-  if (orientation == 0 && getEastWall(x, y) == 0)
+  if (orientation == 0 && getEastWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 1 && getSouthWall(x, y) == 0)
+  else if (orientation == 1 && getSouthWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 2 && getWestWall(x, y) == 0)
+  else if (orientation == 2 && getWestWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 3 && getNorthWall(x, y) == 0)
+  else if (orientation == 3 && getNorthWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
@@ -347,23 +365,30 @@ bool canGoRight(int x, int y, int orientation)
 
 bool canGoBackwards(int x, int y, int orientation)
 {
-  if (orientation == 0 && getSouthWall(x, y) == 0)
+  if (orientation == 0 && getSouthWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 1 && getWestWall(x, y) == 0)
+  else if (orientation == 1 && getWestWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 2 && getNorthWall(x, y) == 0)
+  else if (orientation == 2 && getNorthWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
-  else if (orientation == 3 && getEastWall(x, y) == 0)
+  else if (orientation == 3 && getEastWall(x, y) == 0 && noRobot(x,y,orientation))
   {
     return true;
   }
   return false;
+}
+
+/*
+ * Returns true if there is no robot in the next position, false otherwise.
+ */
+bool noRobot(int x, int y, int orientation) {
+  return nextCoor(x,y,orientation) != robot_coordinates;
 }
 
 //at x,y, facing [orientation], the next square coordinate

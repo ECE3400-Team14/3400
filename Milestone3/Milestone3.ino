@@ -32,6 +32,8 @@ int fft_mux_pin = 6;  //pin for selecting Audio/IR signal
 bool fft_detect = false;  //starting state of fft
 bool has_started = false; //false: wait for audio signal
 
+int robot_coordinates = -1;//approximate coordinates of a robot if detected (-1 indicates no robot)
+
 //maze data
 
 #define rowLength 5 //y
@@ -70,7 +72,7 @@ void setup()
   pinMode(mux0, OUTPUT);
   pinMode(mux1, OUTPUT);
   pinMode(fft_mux_pin, OUTPUT);
-  Serial.println("Wait for button");
+  //Serial.println("Wait for button");
 
   //uncomment for start button
   //while(digitalRead(buttonPin)==LOW);
@@ -79,7 +81,7 @@ void setup()
 
   //Serial.println("Button Pressed");
   fft_setup(); //ADDED
-  Serial.println("FFT Setup Complete");
+  //Serial.println("FFT Setup Complete");
 
   digitalWrite(fft_mux_pin, LOW);
 
@@ -244,9 +246,21 @@ void updateMaze()
   int hasFrontWall = readForwardWallSensor();
   int hasRightWall = readRightWallSensor();
   int hasLeftWall = readLeftWallSensor();
+
+  //ROBOT DETECTION
+  fft_analyze();
+  if(fft_detect) {
+    robot_coordinates = nextCoor(x,y,orientation);//set robot in forward square
+  }
+  else {
+    robot_coordinates = -1;//clear the robot
+  }
+
+  
   if (orientation == 0)
   {
-    setNorthWall(x, y, hasFrontWall);
+    //don't set front wall if robot was detected
+    if(robot_coordinates == -1) { setNorthWall(x, y, hasFrontWall); }
     setEastWall(x, y, hasRightWall);
     setWestWall(x, y, hasLeftWall);
     //robot starts with wall behind it
@@ -255,7 +269,7 @@ void updateMaze()
   }
   else if (orientation == 1)
   {
-    setEastWall(x, y, hasFrontWall);
+    if(robot_coordinates == -1) {setEastWall(x, y, hasFrontWall); }
     setSouthWall(x, y, hasRightWall);
     setNorthWall(x, y, hasLeftWall);
     if (x == start_x && y == start_y)
@@ -264,7 +278,7 @@ void updateMaze()
   }
   else if (orientation == 2)
   {
-    setSouthWall(x, y, hasFrontWall);
+    if(robot_coordinates == -1) {setSouthWall(x, y, hasFrontWall);}
     setWestWall(x, y, hasRightWall);
     setEastWall(x, y, hasLeftWall);
     //setNorthWall(x,y,0);
@@ -273,7 +287,7 @@ void updateMaze()
   }
   else
   {
-    setWestWall(x, y, hasFrontWall);
+    if(robot_coordinates == -1) {setWestWall(x, y, hasFrontWall);}
     setNorthWall(x, y, hasRightWall);
     setSouthWall(x, y, hasLeftWall);
     //setEastWall(x,y,0);
@@ -281,6 +295,7 @@ void updateMaze()
       setEastWall(x, y, 1); //robot starts with wall behind it
   }
   setExplored(x, y, 1);
+
 }
 
 /* Is it BFS? Is it Dijkstra? It's kinda both and neither
