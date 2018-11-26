@@ -69,9 +69,11 @@ void fft_analyze() {
         //Serial.println(fft_log_out[17]);
         start_count++;
         if(start_count == count_max) {
-          Serial.println("Go!!!!!!");
-          Serial.println("Disabling Audio Detection");
-          Serial.println("Enabling IR Detection");
+          if(debug) {
+            Serial.println("Go!!!!!!");
+            Serial.println("Disabling Audio Detection");
+            Serial.println("Enabling IR Detection");
+          }
           has_started = true;//start the Robot and IR analysis
           //digitalWrite(mux_pin, HIGH);//Set mux to IR input
           start_count = 0;
@@ -93,11 +95,11 @@ void fft_analyze() {
       else{
         //Serial.println(fft_log_out[21]);
         if (fft_log_out[11] > IR_threshold /*55*/  ){
-            Serial.println("Robot Detected!!!");
+            if (debug) Serial.println("Robot Detected!!!");
             fft_detect = true;
         }
         else{
-           Serial.println("No Robot Detected");
+           if (debug) Serial.println("No Robot Detected");
            start_count = (start_count != 0) ? start_count - 1 : 0;
            fft_detect = false;
         } 

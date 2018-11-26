@@ -109,9 +109,9 @@ void sendMaze()
   //bool ok = radio.write( mazeData+x+rowLength*y, sizeof(unsigned int) );
   bool ok = radio.write(&data, sizeof(unsigned int));
   if (ok)
-    Serial.println("ok...");
+    if (debug) Serial.println("ok...");
   else
-    Serial.print("failed.\n\r");
+    if (debug) Serial.print("failed.\n\r");
 
   // Now, continue listening
   radio.startListening();
@@ -126,7 +126,7 @@ void sendMaze()
   // if timed out, resend
   if (timeout)
   {
-    Serial.print("Failed, response timed out.\n\r");
+    if (debug) Serial.print("Failed, response timed out.\n\r");
     //sendMaze();
   }
 }

@@ -12,8 +12,8 @@ void moveToNextUnexplored()
   while (!movementStack.isEmpty())
   {
     char move = movementStack.pop();
-    Serial.print("Move: ");
-    Serial.println(move);
+//    Serial.print("Move: ");
+//    Serial.println(move);
     performAction(move);
   }
 }
@@ -30,14 +30,14 @@ void performAction(char m)
   //TODO: also have robot detection here(exit if there is a robot in the path)
   if (m == 'f')
   {
-    Serial.println("Going Forward");
+    //Serial.println("Going Forward");
     leaveIntersection();
     forwardAndStop();
     updateCoor();
   }
   else if (m == 'l')
   {
-    Serial.println("Going Left");
+    //Serial.println("Going Left");
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
@@ -46,7 +46,7 @@ void performAction(char m)
   }
   else if (m == 'r')
   {
-    Serial.println("Going Right");
+    //Serial.println("Going Right");
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation + 1);
@@ -55,7 +55,7 @@ void performAction(char m)
   }
   else if (m == 't')
   {
-    Serial.println("Turning");
+    //Serial.println("Turning");
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
