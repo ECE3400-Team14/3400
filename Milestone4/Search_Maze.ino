@@ -3,7 +3,7 @@
  * 
  */
 
- const bool enable_abort;//enables/disables movement aborts
+ const bool enable_abort = true;//enables/disables movement aborts
 
 //once moves to next node have been created, run all of the moves in the movement stack
 void moveToNextUnexplored()
