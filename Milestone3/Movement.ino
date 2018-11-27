@@ -12,7 +12,7 @@
   void leaveIntersection() {
     forward();
     while (readLeftmostSensor() == 0 || readRightmostSensor() == 0);
-    delay(40);
+    delay(20);//changed
     //stopMovement();
   }
 
@@ -33,7 +33,7 @@ void forwardAndStop(){
       //perform FFT every __ number of cycles
       
       if (i == fft_cycle) {
-        Serial.println("Running fft");
+        if (debug) Serial.println("Running fft");
         fft_analyze();
         while (fft_detect) {
           stopMovement();

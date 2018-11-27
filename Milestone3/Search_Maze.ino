@@ -6,11 +6,12 @@
 //once moves to next node have been created, run all of the moves in the movement stack
 void moveToNextUnexplored()
 {
+  //set previous coordinates to current coordinates before move
   while (!movementStack.isEmpty())
   {
     char move = movementStack.pop();
-    Serial.print("Move: ");
-    Serial.println(move);
+//    Serial.print("Move: ");
+//    Serial.println(move);
     performAction(move);
   }
 }
@@ -23,18 +24,20 @@ void moveToNextUnexplored()
 //TODO: add Wall sensor/IR feedback to make sure we don't crash
 void performAction(char m)
 {
+  prev_x = x;
+  prev_y = y;
   //TODO: if going to run into wall, return
   //TODO: also have robot detection here(exit if there is a robot in the path)
   if (m == 'f')
   {
-    Serial.println("Going Forward");
+    //Serial.println("Going Forward");
     leaveIntersection();
     forwardAndStop();
     updateCoor();
   }
   else if (m == 'l')
   {
-    Serial.println("Going Left");
+    //Serial.println("Going Left");
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
@@ -43,7 +46,7 @@ void performAction(char m)
   }
   else if (m == 'r')
   {
-    Serial.println("Going Right");
+    //Serial.println("Going Right");
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation + 1);
@@ -52,7 +55,7 @@ void performAction(char m)
   }
   else if (m == 't')
   {
-    Serial.println("Turning");
+    //Serial.println("Turning");
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;

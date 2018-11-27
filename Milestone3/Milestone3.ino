@@ -1,28 +1,28 @@
 //robot settings
 const bool debug = false;
-const bool transmit = false;
+const bool transmit = true;
 
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
  * 
  * Written by: David Burgstahler (dfb93), Gregory Kaiser (ghk48), Andrew Lin (yl656), and Michaelangelo Rodriguez Ayala (mr2242)
  */
-#include <QueueArray.h>
-#include <QueueList.h>
+//#include <QueueArray.h>
+//#include <QueueList.h>
 #include <LinkedList.h>
 #include <StackArray.h>
 #include <Servo.h>
 #include "printf.h"
 Servo left;
 Servo right;
-int buttonPin = 0;        //pin assigned to start button (NOT CURRENTLY IN USE)
+#define buttonPin 0       //pin assigned to start button (NOT CURRENTLY IN USE)
 int rightWallSensor = A5; //read right wall sensor data
-int rightWallLED = 7;     //TEMP
+int rightWallLED = 7;    //TEMP
 int frontWallSensor = A4;
 int leftWallSensor = A1;
 int frontWallLED = 8;
-int mux0 = 2;         //line sensor mux input 0
-int mux1 = 4;         //line sensor mux input 2
+#define mux0 2         //line sensor mux input 0
+#define mux1 4         //line sensor mux input 2
 int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
 int fft_cycle = 10;   //number of movement cycles between FFT detections (see forwardAndStop())
@@ -34,18 +34,21 @@ bool has_started = false; //false: wait for audio signal
 
 //maze data
 
-#define rowLength 4 //y
+#define rowLength 5 //y
 #define colLength 4 //x
 
-const int mazeSize = rowLength * colLength;
+const byte mazeSize = rowLength * colLength;
 
 //starting position
 #define start_orientation 2
 #define start_x 0
 #define start_y 0
-int orientation = start_orientation; //0=north, 1=east, 2=south, 3=west
-int x = start_x;
-int y = start_y;
+byte orientation = start_orientation; //0=north, 1=east, 2=south, 3=west
+byte x = start_x;
+byte y = start_y;
+
+byte prev_x = -1;//previous x coordinate (-1 default)
+byte prev_y = -1;//previous y coordinate (-1 by default)
 
 StackArray<char> movementStack; //stack of movements to follow
 
@@ -88,13 +91,14 @@ void setup()
   }
   digitalWrite(fft_mux_pin, HIGH);
 
-  initMaze();
+  //initMaze(); (removed to save memory)
   printf_begin();
   radioSetup();
 
   //stack setup
-  initialize_search();
-  append_frontier(getPosition(x, y));
+  //initialize_search();
+  //append_frontier(getPosition(x, y));
+  //delay(10000);//delay start
 }
 
 void loop()
@@ -103,7 +107,7 @@ void loop()
   {
     //search();
     //rightWallFollowing();
-    bfs_mod_search();
+    dijkstra_search();
   }
   //debug
   else
@@ -152,17 +156,17 @@ void loop()
     fft_analyze();
     Serial.println();
     //orientation code:
-    //   updateCoor();
-    //   Serial.print("Orientation:");
-    //   Serial.println(orientation);
-    //   Serial.print(x);
-    //   Serial.print(", ");
-    //   Serial.print(y);
-    //   Serial.println();
-    //   orientation = (orientation == 0) ? 3 : orientation - 1;
-    //   updateMaze();
-    //   sendMaze();
-    //   delay(1000);
+//       updateCoor();
+//       Serial.print("Orientation:");
+//       Serial.println(orientation);
+//       Serial.print(x);
+//       Serial.print(", ");
+//       Serial.print(y);
+//       Serial.println();
+//       orientation = (orientation == 0) ? 3 : orientation - 1;
+//       updateMaze();
+//       sendMaze();
+//       delay(1000);
   }
 }
 
@@ -289,15 +293,23 @@ void updateMaze()
  * through the explored squares and executes this path
  * 
  */
-void bfs_mod_search()
+void dijkstra_search()
 {
   updateMaze(); //analyze walls, set square as explored
-  if (transmit)
+  if (transmit && hasMoved())
   {
     sendMaze();
   }                           //send new maze data
-  bfs_mod(getPosition(x, y)); //find the closest frontier square and create a path to it
-  moveToNextUnexplored();     //perform set of actions gererated by bfs_mod
+  dijkstra(getPosition(x, y)); //find the closest frontier square and create a path to it
+  moveToNextUnexplored();     //perform set of actions gererated by dijkstra
+}
+
+/*
+ * Returns true if the robot has moved from its previous location since the last search, or if no previous move is recorded, 
+ * false otherwise.
+ */
+bool hasMoved() {
+  return x != prev_x || y != prev_y;
 }
 
 /* (UNIMPLEMENTED) A basic DFS/BFS search algorith*/

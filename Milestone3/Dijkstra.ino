@@ -2,7 +2,7 @@
  *  does dijkstra's algorithm
 */
 
-#define forward_dist 3 //distance weight of forward
+#define forward_dist 2 //distance weight of forward
 #define turn_dist 1    //distance weight of turn
 
 //TODO: Condense data structure memory with byte sharing
@@ -13,7 +13,7 @@ struct Node
   //byte orientation;//orientation of the robot at this point
   byte move_and_or;    //[XXXMMMOO]
   struct Node *parent; //the parent of this node
-  int dist;            //distance from start to [position]
+  byte dist;   //distance from start to [position]
 };
 
 void setMove(struct Node *v, char m)
@@ -210,7 +210,7 @@ Node *getNodeByPos(byte pos)
  *                      Q.push(w)
  * 
 */
-void bfs_mod(int start_pos)
+void dijkstra(int start_pos)
 {
 
   initQueue();        //initialize the queue
@@ -236,6 +236,7 @@ void bfs_mod(int start_pos)
     //if this node hasn't been explored yet, return path to node
     if (!isExplored(getX(pos), getY(pos)))
     {
+      clearQueue(); //clear frontier memory
       constructMovements(v);
       return;
     }
@@ -244,7 +245,7 @@ void bfs_mod(int start_pos)
         //if forward is an option
         if (canGoForward(getX(pos), getY(pos), getOrientation(v)))
     {
-      Serial.println("CanGoForward");
+      //Serial.println("CanGoForward");
       int next_orientation = getOrientation(v);
       int next_pos = nextCoor(getX(pos), getY(pos), next_orientation); //coordinate of destination
       //if(!visitedContains(next_pos)) {//if next coordinate is not visited
@@ -319,7 +320,7 @@ void bfs_mod(int start_pos)
     //if right is an option (turn right with not wall)
     if (canGoRight(getX(pos), getY(pos), getOrientation(v)))
     {
-      Serial.println("CanGoRight");
+      //Serial.println("CanGoRight");
       //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
       int next_orientation = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
       int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);
@@ -359,7 +360,7 @@ void bfs_mod(int start_pos)
     //backwards
     if (canGoBackwards(getX(pos), getY(pos), getOrientation(v)))
     {
-      Serial.println("CanGoBackwards");
+      //Serial.println("CanGoBackwards");
       //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
       int next_orientation_r = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
       int next_orientation = (next_orientation_r == 3) ? 0 : next_orientation_r + 1;
@@ -414,13 +415,12 @@ void constructMovements(struct Node *v)
   {
     //char next_move = v->move;
     char next_move = getMove(v);
-    Serial.print(next_move); //debug
-    Serial.print(" to ");
-    Serial.print(getX(v->position));
-    Serial.print(",");
-    Serial.println(getY(v->position));
+//    Serial.print(next_move); //debug
+//    Serial.print(" to ");
+//    Serial.print(getX(v->position));
+//    Serial.print(",");
+//    Serial.println(getY(v->position));
     movementStack.push(next_move);
     v = v->parent;
   }
-  clearQueue(); //clearMemory
 }

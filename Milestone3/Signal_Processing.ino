@@ -10,11 +10,11 @@ Based off example sketch fft_adc_serial provided by the FFT library
 
 //bool has_started = false;//false: Audio Analysis Stage, true: IR Analysis Stage
 bool IR_initilized = false;
-int IR_threshold = 55;
+const byte IR_threshold = 55;
 //Audio FFT Variables
-int threshold = 100;//the monitored signal bin amplitude threshold for detection
-int start_count = 0;// counter for keeping track of back-to-back detections
-int count_max = 10;// the number of back-to-back detections for a confirmed detection
+const byte threshold = 100;//the monitored signal bin amplitude threshold for detection
+byte start_count = 0;// counter for keeping track of back-to-back detections
+const byte count_max = 10;// the number of back-to-back detections for a confirmed detection
 
 //int mux_pin = 6; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
 
@@ -69,9 +69,11 @@ void fft_analyze() {
         //Serial.println(fft_log_out[17]);
         start_count++;
         if(start_count == count_max) {
-          Serial.println("Go!!!!!!");
-          Serial.println("Disabling Audio Detection");
-          Serial.println("Enabling IR Detection");
+          if(debug) {
+            Serial.println("Go!!!!!!");
+            Serial.println("Disabling Audio Detection");
+            Serial.println("Enabling IR Detection");
+          }
           has_started = true;//start the Robot and IR analysis
           //digitalWrite(mux_pin, HIGH);//Set mux to IR input
           start_count = 0;
@@ -93,11 +95,11 @@ void fft_analyze() {
       else{
         //Serial.println(fft_log_out[21]);
         if (fft_log_out[11] > IR_threshold /*55*/  ){
-            Serial.println("Robot Detected!!!");
+            if (debug) Serial.println("Robot Detected!!!");
             fft_detect = true;
         }
         else{
-           Serial.println("No Robot Detected");
+           if (debug) Serial.println("No Robot Detected");
            start_count = (start_count != 0) ? start_count - 1 : 0;
            fft_detect = false;
         } 
