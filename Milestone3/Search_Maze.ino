@@ -7,8 +7,6 @@
 void moveToNextUnexplored()
 {
   //set previous coordinates to current coordinates before move
-  prev_x = x;
-  prev_y = y;
   while (!movementStack.isEmpty())
   {
     char move = movementStack.pop();

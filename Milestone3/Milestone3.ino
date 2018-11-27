@@ -87,7 +87,7 @@ void setup()
   while (has_started == false)
   {
     fft_analyze();
-    if (debug) Serial.println("Waiting");
+    Serial.println("Waiting");
   }
   digitalWrite(fft_mux_pin, HIGH);
 
@@ -113,60 +113,60 @@ void loop()
   else
   {
     // troubleshooting code block:
-//    int leftmost = readLeftmostSensor();
-//    Serial.print("LL:");
-//    Serial.print(leftmost);
-//    Serial.print("|");
-//    int left = readLeftSensor();
-//    Serial.print("L:");
-//    Serial.print(left);
-//    Serial.print("|");
-//    int right = readRightSensor();
-//    Serial.print("R:");
-//    Serial.print(right);
-//    Serial.print("|");
-//    int rightmost = readRightmostSensor();
-//    Serial.print("RR:");
-//    Serial.print(rightmost);
-//    Serial.print("|");
-//    //    int hasRightWall = readRightWallSensor();
-//    //    int hasFrontWall = readForwardWallSensor();
-//    //    int hasLeftWall = readLeftWallSensor();
-//    //    Serial.print("LW:");
-//    //    Serial.print(hasLeftWall);
-//    //    Serial.print(" ");
-//    //    Serial.print("FW:");
-//    //    Serial.print(hasFrontWall);
-//    //    Serial.print(" ");
-//    //    Serial.print("RW:");
-//    //    Serial.print(hasRightWall);
-//    updateMaze();
-//    Serial.print("Left:");
-//    Serial.print(canGoLeft(x, y, orientation));
-//    Serial.print(" ");
-//    Serial.print("FW:");
-//    Serial.print(canGoForward(x, y, orientation));
-//    Serial.print(" ");
-//    Serial.print("Rigth:");
-//    Serial.print(canGoRight(x, y, orientation));
-//    Serial.print(" ");
-//
-//    //Serial.println();
-//    Serial.print(", ");
-//    fft_analyze();
-//    Serial.println();
+    int leftmost = readLeftmostSensor();
+    Serial.print("LL:");
+    Serial.print(leftmost);
+    Serial.print("|");
+    int left = readLeftSensor();
+    Serial.print("L:");
+    Serial.print(left);
+    Serial.print("|");
+    int right = readRightSensor();
+    Serial.print("R:");
+    Serial.print(right);
+    Serial.print("|");
+    int rightmost = readRightmostSensor();
+    Serial.print("RR:");
+    Serial.print(rightmost);
+    Serial.print("|");
+    //    int hasRightWall = readRightWallSensor();
+    //    int hasFrontWall = readForwardWallSensor();
+    //    int hasLeftWall = readLeftWallSensor();
+    //    Serial.print("LW:");
+    //    Serial.print(hasLeftWall);
+    //    Serial.print(" ");
+    //    Serial.print("FW:");
+    //    Serial.print(hasFrontWall);
+    //    Serial.print(" ");
+    //    Serial.print("RW:");
+    //    Serial.print(hasRightWall);
+    updateMaze();
+    Serial.print("Left:");
+    Serial.print(canGoLeft(x, y, orientation));
+    Serial.print(" ");
+    Serial.print("FW:");
+    Serial.print(canGoForward(x, y, orientation));
+    Serial.print(" ");
+    Serial.print("Rigth:");
+    Serial.print(canGoRight(x, y, orientation));
+    Serial.print(" ");
+
+    //Serial.println();
+    Serial.print(", ");
+    fft_analyze();
+    Serial.println();
     //orientation code:
-       updateCoor();
-       Serial.print("Orientation:");
-       Serial.println(orientation);
-       Serial.print(x);
-       Serial.print(", ");
-       Serial.print(y);
-       Serial.println();
-       orientation = (orientation == 0) ? 3 : orientation - 1;
-       updateMaze();
-       sendMaze();
-       delay(1000);
+//       updateCoor();
+//       Serial.print("Orientation:");
+//       Serial.println(orientation);
+//       Serial.print(x);
+//       Serial.print(", ");
+//       Serial.print(y);
+//       Serial.println();
+//       orientation = (orientation == 0) ? 3 : orientation - 1;
+//       updateMaze();
+//       sendMaze();
+//       delay(1000);
   }
 }
 
@@ -217,6 +217,8 @@ void rightWallFollowing()
 //updates current coordinates of robot
 void updateCoor()
 {
+  prev_x = x;
+  prev_y = y;
   if (orientation == 0)
   {
     x = (x == 0) ? 0 : x - 1;
