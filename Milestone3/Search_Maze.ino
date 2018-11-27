@@ -24,6 +24,8 @@ void moveToNextUnexplored()
 //TODO: add Wall sensor/IR feedback to make sure we don't crash
 void performAction(char m)
 {
+  prev_x = x;
+  prev_y = y;
   //TODO: if going to run into wall, return
   //TODO: also have robot detection here(exit if there is a robot in the path)
   if (m == 'f')

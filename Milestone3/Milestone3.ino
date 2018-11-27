@@ -217,8 +217,6 @@ void rightWallFollowing()
 //updates current coordinates of robot
 void updateCoor()
 {
-  prev_x = x;
-  prev_y = y;
   if (orientation == 0)
   {
     x = (x == 0) ? 0 : x - 1;
