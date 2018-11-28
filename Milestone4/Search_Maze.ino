@@ -323,7 +323,8 @@ bool canGoForward(int x, int y, int orientation)
  */
 bool canGoLeft(int x, int y, int orientation)
 {
-  if(fft_detect && nextCoor(x,y,orientation) == detected_robot) return false;
+  int next_orientation = (orientation == 0) ? 3 : orientation - 1;
+  if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
   if (orientation == 0 && getWestWall(x, y) == 0)
   {
     return true;
@@ -350,7 +351,8 @@ bool canGoLeft(int x, int y, int orientation)
  */
 bool canGoRight(int x, int y, int orientation)
 {
-  if(fft_detect && nextCoor(x,y,orientation) == detected_robot) return false;
+  int next_orientation = (orientation == 3) ? 0 : orientation + 1;
+  if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
   if (orientation == 0 && getEastWall(x, y) == 0)
   {
     return true;
@@ -372,7 +374,9 @@ bool canGoRight(int x, int y, int orientation)
 
 bool canGoBackwards(int x, int y, int orientation)
 {
-  if(fft_detect && nextCoor(x,y,orientation) == detected_robot) return false;
+  int next_orientation = (orientation == 3) ? 0 : orientation + 1;
+  next_orientation = (next_orientation == 3) ? 0 : next_orientation + 1;
+  if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
   if (orientation == 0 && getSouthWall(x, y) == 0)
   {
     return true;

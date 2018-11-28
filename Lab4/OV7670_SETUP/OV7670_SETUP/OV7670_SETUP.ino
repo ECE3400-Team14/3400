@@ -30,10 +30,14 @@ void setup() {
   read_key_registers();
   set_color_matrix();
   Serial.println("The arduino has set the color matrix");
+
+  setupComm();
 }
 
 void loop(){
- }
+  delay(700);
+  readShape();
+}
 
 
 ///////// Function Definition //////////////

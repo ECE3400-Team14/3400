@@ -1,6 +1,6 @@
 //robot settings
 const bool debug = false;
-const bool transmit = true;
+const bool transmit = false;
 
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
@@ -71,7 +71,7 @@ void setup()
   pinMode(mux0, OUTPUT);
   pinMode(mux1, OUTPUT);
   pinMode(fft_mux_pin, OUTPUT);
-  Serial.println("Wait for button");
+  //Serial.println("Wait for button");
 
   //uncomment for start button
   //while(digitalRead(buttonPin)==LOW);
@@ -80,7 +80,7 @@ void setup()
 
   //Serial.println("Button Pressed");
   fft_setup(); //ADDED
-  Serial.println("FFT Setup Complete");
+  //Serial.println("FFT Setup Complete");
 
   digitalWrite(fft_mux_pin, LOW);
 
@@ -113,6 +113,7 @@ void loop()
   //debug
   else
   {
+    stopMovement();
     // troubleshooting code block:
     int leftmost = readLeftmostSensor();
     Serial.print("LL:");
@@ -142,19 +143,21 @@ void loop()
     //    Serial.print("RW:");
     //    Serial.print(hasRightWall);
     updateMaze();
+    Serial.print(" | ");
     Serial.print("Left:");
     Serial.print(canGoLeft(x, y, orientation));
     Serial.print(" ");
     Serial.print("FW:");
     Serial.print(canGoForward(x, y, orientation));
     Serial.print(" ");
-    Serial.print("Rigth:");
+    Serial.print("Right:");
     Serial.print(canGoRight(x, y, orientation));
     Serial.print(" ");
 
     //Serial.println();
     Serial.print(", ");
     fft_analyze();
+    Serial.println();
     Serial.println();
     //orientation code:
 //       updateCoor();
