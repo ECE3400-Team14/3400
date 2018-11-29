@@ -8,7 +8,7 @@ byte shape_data;
 void setupComm() {
   pinMode(sig, OUTPUT);
   pinMode(data, INPUT);
-  digitalWrite(sig, HIGH);
+  digitalWrite(sig, LOW);
 }
 
 void readShape() {
@@ -68,9 +68,9 @@ byte readData() {
 }
 
 void switchSig() {
-  digitalWrite(sig, LOW);
-  delay(switch_length);
   digitalWrite(sig, HIGH);
+  delay(switch_length);
+  digitalWrite(sig, LOW);
   delay(switch_length);
 }
 

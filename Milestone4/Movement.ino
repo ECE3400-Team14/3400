@@ -48,7 +48,7 @@ int forwardAndStop()
       if (debug)
         Serial.println("Running fft");
       fft_analyze();
-      if (enable_abort && (fft_detect || readForwardWallClose()))
+      if (enable_abort && (fft_detect /*|| readForwardWallClose()*/))
       {
         //abort
         stopMovement();
