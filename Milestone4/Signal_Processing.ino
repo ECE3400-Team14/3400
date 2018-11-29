@@ -10,7 +10,7 @@ Based off example sketch fft_adc_serial provided by the FFT library
 
 //bool has_started = false;//false: Audio Analysis Stage, true: IR Analysis Stage
 bool IR_initilized = false;
-const byte IR_threshold = 70;
+const byte IR_threshold = 67;
 //Audio FFT Variables
 const byte threshold = 100;//the monitored signal bin amplitude threshold for detection
 byte start_count = 0;// counter for keeping track of back-to-back detections

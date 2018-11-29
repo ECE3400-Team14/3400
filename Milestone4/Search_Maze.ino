@@ -3,7 +3,7 @@
  * 
  */
 
- const bool enable_abort = true;//enables/disables movement aborts
+const bool enable_abort = false; //enables/disables movement aborts
 
 //once moves to next node have been created, run all of the moves in the movement stack
 void moveToNextUnexplored()
@@ -12,17 +12,19 @@ void moveToNextUnexplored()
   while (!movementStack.isEmpty())
   {
     char move = movementStack.pop();
-//    Serial.print("Move: ");
-//    Serial.println(move);
-    if (performAction(move) == 0) {
+    //    Serial.print("Move: ");
+    //    Serial.println(move);
+    if (performAction(move) == 0)
+    {
       //abort
       clearMovementStack();
     }
   }
 }
 
-void clearMovementStack() {
-  while (!movementStack.isEmpty()) 
+void clearMovementStack()
+{
+  while (!movementStack.isEmpty())
   {
     movementStack.pop();
   }
@@ -43,7 +45,8 @@ int performAction(char m)
   if (m == 'f')
   {
     //Serial.println("Going Forward");
-    if (enable_abort && checkForObstacle()) return 0;
+    if (enable_abort && checkForObstacle())
+      return 0;
     leaveIntersection();
     forwardAndStop();
     updateCoor();
@@ -54,7 +57,8 @@ int performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-    if (enable_abort && checkForObstacle()) return 0;
+    if (enable_abort && checkForObstacle())
+      return 0;
     forwardAndStop();
     updateCoor();
   }
@@ -64,7 +68,8 @@ int performAction(char m)
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation + 1);
-    if (enable_abort && checkForObstacle()) return 0;
+    if (enable_abort && checkForObstacle())
+      return 0;
     forwardAndStop();
     updateCoor();
   }
@@ -77,7 +82,8 @@ int performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-    if (enable_abort && checkForObstacle()) return 0;
+    if (enable_abort && checkForObstacle())
+      return 0;
     forwardAndStop();
     updateCoor();
   }
@@ -88,8 +94,9 @@ int performAction(char m)
   return 1;
 }
 
-bool checkForObstacle() {
-  fft_analyze();
+bool checkForObstacle()
+{
+  fft_at_intersection();
   return (fft_detect);
 }
 
@@ -296,7 +303,7 @@ char get_next_move(int x, int y, int new_x, int new_y, int orientation)
  */
 bool canGoForward(int x, int y, int orientation)
 {
-  if(fft_detect && nextCoor(x,y,orientation) == detected_robot) return false;
+  //if(fft_detect && nextCoor(x,y,orientation) == detected_robot) return false;
   if (orientation == 0 && getNorthWall(x, y) == 0)
   {
     return true;
@@ -323,8 +330,8 @@ bool canGoForward(int x, int y, int orientation)
  */
 bool canGoLeft(int x, int y, int orientation)
 {
-  int next_orientation = (orientation == 0) ? 3 : orientation - 1;
-  if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
+  // int next_orientation = (orientation == 0) ? 3 : orientation - 1;
+  // if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
   if (orientation == 0 && getWestWall(x, y) == 0)
   {
     return true;
@@ -351,8 +358,8 @@ bool canGoLeft(int x, int y, int orientation)
  */
 bool canGoRight(int x, int y, int orientation)
 {
-  int next_orientation = (orientation == 3) ? 0 : orientation + 1;
-  if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
+  // int next_orientation = (orientation == 3) ? 0 : orientation + 1;
+  // if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
   if (orientation == 0 && getEastWall(x, y) == 0)
   {
     return true;
@@ -374,9 +381,9 @@ bool canGoRight(int x, int y, int orientation)
 
 bool canGoBackwards(int x, int y, int orientation)
 {
-  int next_orientation = (orientation == 3) ? 0 : orientation + 1;
-  next_orientation = (next_orientation == 3) ? 0 : next_orientation + 1;
-  if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
+  // int next_orientation = (orientation == 3) ? 0 : orientation + 1;
+  // next_orientation = (next_orientation == 3) ? 0 : next_orientation + 1;
+  // if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
   if (orientation == 0 && getSouthWall(x, y) == 0)
   {
     return true;

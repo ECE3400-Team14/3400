@@ -35,7 +35,7 @@ void setup() {
 }
 
 void loop(){
-  delay(700);
+  //delay(1000);
   readShape();
 }
 

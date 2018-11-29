@@ -35,16 +35,48 @@ void forwardAndStop(){
       if (i == fft_cycle) {
         if (debug) Serial.println("Running fft");
         fft_analyze();
-        while (fft_detect) {
+        if(fft_detect) {
           stopMovement();
-          fft_analyze();
-        } //Added
+          backwardsAndStop();
+          while (fft_detect) {
+            delay(20);
+            fft_analyze();
+          } //Added
+          leaveIntersection();
+          //delay(20);
+        }
+        
         i = 0;
       }
       else { i++; }
       
     }
   stopMovement();
+}
+
+void backwardsAndStop() {
+   int i = 0;
+    while (readLeftmostSensor() == 1 && readRightmostSensor() == 1){
+       trackLineBackwards();
+    }
+    stopMovement();
+}
+
+void trackLineBackwards() {
+  if (readLeftSensor() == 0 && readRightSensor() == 0)
+      backward();
+    else if (readLeftSensor() == 0 && readRightSensor() == 1){
+      while (readLeftSensor() == 0) forward();
+      writeRight(0);
+      writeLeft(90);
+    }
+    else if (readLeftSensor() == 1 && readRightSensor() == 0){
+      while (readRightSensor() == 0) forward();
+      writeLeft(0);
+      writeRight(90);
+    }
+    else
+      backward();
 }
 
 void forwardAndLeft(){

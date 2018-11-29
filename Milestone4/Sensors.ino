@@ -92,7 +92,7 @@ int readLeftSensor(){
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 400? 1:0;//357
+  return val > 500? 1:0;//400
   }
 int readRightSensor(){
   digitalWrite(mux0, HIGH);
@@ -101,7 +101,7 @@ int readRightSensor(){
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 350? 1:0;//297
+  return val > 450? 1:0;//350
   }
 int readLeftmostSensor(){
   digitalWrite(mux0, HIGH);
@@ -110,7 +110,7 @@ int readLeftmostSensor(){
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 700? 1:0;
+  return val > 750? 1:0;//700
   }
 int readRightmostSensor(){
   digitalWrite(mux0, LOW);
@@ -119,5 +119,5 @@ int readRightmostSensor(){
   int val = analogRead(muxRead);
   //Serial.print(val);
 //  Serial.print("\n");
-  return val > 570? 1:0;
+  return val > 700? 1:0;//570//630
   }

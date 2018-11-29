@@ -1,6 +1,6 @@
 //robot settings
 const bool debug = false;
-const bool transmit = false;
+const bool transmit = true;
 
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
@@ -27,6 +27,7 @@ int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
 int fft_cycle = 10;   //number of movement cycles between FFT detections (see forwardAndStop())
 int fft_mux_pin = 6;  //pin for selecting Audio/IR signal
+const int fft_intersection_cycles = 3;
 
 //fft settings
 bool fft_detect = false;  //starting state of fft
@@ -78,9 +79,9 @@ void setup()
 
   analogRead(1); //initialize analog
 
-  //Serial.println("Button Pressed");
+  //Serial.println("B");
   fft_setup(); //ADDED
-  //Serial.println("FFT Setup Complete");
+  if(debug) Serial.println("FFT");
 
   digitalWrite(fft_mux_pin, LOW);
 
@@ -88,9 +89,11 @@ void setup()
   while (has_started == false)
   {
     fft_analyze();
-    Serial.println("Waiting");
+    //Serial.println("Waiting");
+    delay(10);
   }
   digitalWrite(fft_mux_pin, HIGH);
+  fft_analyze();//reset
 
   //initMaze(); (removed to save memory)
   printf_begin();
@@ -113,7 +116,10 @@ void loop()
   //debug
   else
   {
-    stopMovement();
+    
+    //forwardAndStop();
+    //backwardsAndStop();
+    //stopMovement();
     // troubleshooting code block:
     int leftmost = readLeftmostSensor();
     Serial.print("LL:");
@@ -155,8 +161,8 @@ void loop()
     Serial.print(" ");
 
     //Serial.println();
-    Serial.print(", ");
-    fft_analyze();
+//    Serial.print(", ");
+//    fft_analyze();
     Serial.println();
     Serial.println();
     //orientation code:
@@ -287,9 +293,17 @@ void updateMaze()
   setExplored(x, y, 1);
 
   //check for robot
-  fft_analyze();
-  if(fft_detect) {
-    detected_robot = nextCoor(x,y,orientation);//set the forward coordinate as the approximate spot of a robot
+//  fft_at_intersection();
+//  if(fft_detect) {
+//    //Serial.println("detect");
+//    detected_robot = nextCoor(x,y,orientation);//set the forward coordinate as the approximate spot of a robot
+//  }
+}
+
+int fft_at_intersection() {
+  for(int i = 0; i < fft_intersection_cycles; i++) {
+    fft_analyze();
+    if(fft_detect) break;
   }
 }
 
