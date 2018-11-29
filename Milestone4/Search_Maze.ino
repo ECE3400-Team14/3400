@@ -3,8 +3,6 @@
  * 
  */
 
-const bool enable_abort = true; //enables/disables movement aborts
-
 //once moves to next node have been created, run all of the moves in the movement stack
 void moveToNextUnexplored()
 {
@@ -130,31 +128,34 @@ bool checkForObstacle()
   return (fft_detect);
 }
 
-int toNextSquare()
-{
-  if (forwardAndStop())
-  {
-    updateCoor();
-    return 1;
-  }
-  //aborted movement
-  else
-  {
-    turnAround();
-    forwardAndStop();
-    orientation = (orientation == 0) ? 3 : orientation - 1;
-    orientation = (orientation == 0) ? 3 : orientation - 1;
-  }
-}
+// int toNextSquare()
+// {
+//   if (forwardAndStop())
+//   {
+//     updateCoor();
+//     return 1;
+//   }
+//   //aborted movement
+//   else
+//   {
+//     turnAround();
+//     forwardAndStop();
+//     orientation = (orientation == 0) ? 3 : orientation - 1;
+//     orientation = (orientation == 0) ? 3 : orientation - 1;
+//   }
+// }
 /**
- * Turn around and go back to where you came from
+ * Turn around and go back to where you came from (to where there is not wall/robot)
  */
 void abortMove()
 {
   turnAround();
-  forwardAndStop();
   orientation = (orientation == 0) ? 3 : orientation - 1;
   orientation = (orientation == 0) ? 3 : orientation - 1;
+  if (forwardAndStop() == 0)
+  {
+    return abortMove(); //try this again
+  }
 }
 
 //adds new stuff to the frontier at x,y [Order: R,L,F].
