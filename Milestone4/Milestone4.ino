@@ -17,12 +17,12 @@ Servo left;
 Servo right;
 #define buttonPin 0       //pin assigned to start button (NOT CURRENTLY IN USE)
 int rightWallSensor = A5; //read right wall sensor data
-int rightWallLED = 7;    //TEMP
+int rightWallLED = 7;     //TEMP
 int frontWallSensor = A4;
 int leftWallSensor = A1;
 int frontWallLED = 8;
-#define mux0 2         //line sensor mux input 0
-#define mux1 4         //line sensor mux input 2
+#define mux0 2        //line sensor mux input 0
+#define mux1 4        //line sensor mux input 2
 int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
 int fft_cycle = 10;   //number of movement cycles between FFT detections (see forwardAndStop())
@@ -33,7 +33,8 @@ const int fft_intersection_cycles = 3;
 bool fft_detect = false;  //starting state of fft
 bool has_started = false; //false: wait for audio signal
 
-int detected_robot = -1;//the approximate coordinates of a detected robot (if found), -1 by default
+int detected_robot = -1;        //the approximate coordinates of a detected robot (if found), -1 by default
+const bool enable_abort = true; //enables/disables movement aborts
 //maze data
 
 #define rowLength 5 //y
@@ -49,8 +50,8 @@ byte orientation = start_orientation; //0=north, 1=east, 2=south, 3=west
 byte x = start_x;
 byte y = start_y;
 
-byte prev_x = -1;//previous x coordinate (-1 default)
-byte prev_y = -1;//previous y coordinate (-1 by default)
+byte prev_x = -1; //previous x coordinate (-1 default)
+byte prev_y = -1; //previous y coordinate (-1 by default)
 
 StackArray<char> movementStack; //stack of movements to follow
 
@@ -81,7 +82,8 @@ void setup()
 
   //Serial.println("B");
   fft_setup(); //ADDED
-  if(debug) Serial.println("FFT");
+  if (debug)
+    Serial.println("FFT");
 
   digitalWrite(fft_mux_pin, LOW);
 
@@ -93,7 +95,7 @@ void setup()
     delay(10);
   }
   digitalWrite(fft_mux_pin, HIGH);
-  fft_analyze();//reset
+  fft_analyze(); //reset
 
   //initMaze(); (removed to save memory)
   printf_begin();
@@ -116,7 +118,7 @@ void loop()
   //debug
   else
   {
-    
+
     //forwardAndStop();
     //backwardsAndStop();
     //stopMovement();
@@ -161,22 +163,22 @@ void loop()
     Serial.print(" ");
 
     //Serial.println();
-//    Serial.print(", ");
-//    fft_analyze();
+    //    Serial.print(", ");
+    //    fft_analyze();
     Serial.println();
     Serial.println();
     //orientation code:
-//       updateCoor();
-//       Serial.print("Orientation:");
-//       Serial.println(orientation);
-//       Serial.print(x);
-//       Serial.print(", ");
-//       Serial.print(y);
-//       Serial.println();
-//       orientation = (orientation == 0) ? 3 : orientation - 1;
-//       updateMaze();
-//       sendMaze();
-//       delay(1000);
+    //       updateCoor();
+    //       Serial.print("Orientation:");
+    //       Serial.println(orientation);
+    //       Serial.print(x);
+    //       Serial.print(", ");
+    //       Serial.print(y);
+    //       Serial.println();
+    //       orientation = (orientation == 0) ? 3 : orientation - 1;
+    //       updateMaze();
+    //       sendMaze();
+    //       delay(1000);
   }
 }
 
@@ -293,17 +295,20 @@ void updateMaze()
   setExplored(x, y, 1);
 
   //check for robot
-//  fft_at_intersection();
-//  if(fft_detect) {
-//    //Serial.println("detect");
-//    detected_robot = nextCoor(x,y,orientation);//set the forward coordinate as the approximate spot of a robot
-//  }
+  //  fft_at_intersection();
+  //  if(fft_detect) {
+  //    //Serial.println("detect");
+  //    detected_robot = nextCoor(x,y,orientation);//set the forward coordinate as the approximate spot of a robot
+  //  }
 }
 
-int fft_at_intersection() {
-  for(int i = 0; i < fft_intersection_cycles; i++) {
+int fft_at_intersection()
+{
+  for (int i = 0; i < fft_intersection_cycles; i++)
+  {
     fft_analyze();
-    if(fft_detect) break;
+    if (fft_detect)
+      break;
   }
 }
 
@@ -323,16 +328,17 @@ void dijkstra_search()
   if (transmit && hasMoved())
   {
     sendMaze();
-  }                           //send new maze data
+  }                            //send new maze data
   dijkstra(getPosition(x, y)); //find the closest frontier square and create a path to it
-  moveToNextUnexplored();     //perform set of actions gererated by dijkstra
+  moveToNextUnexplored();      //perform set of actions gererated by dijkstra
 }
 
 /*
  * Returns true if the robot has moved from its previous location since the last search, or if no previous move is recorded, 
  * false otherwise.
  */
-bool hasMoved() {
+bool hasMoved()
+{
   return x != prev_x || y != prev_y;
 }
 

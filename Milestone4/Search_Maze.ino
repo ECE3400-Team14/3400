@@ -3,7 +3,7 @@
  * 
  */
 
-const bool enable_abort = false; //enables/disables movement aborts
+const bool enable_abort = true; //enables/disables movement aborts
 
 //once moves to next node have been created, run all of the moves in the movement stack
 void moveToNextUnexplored()
@@ -45,11 +45,18 @@ int performAction(char m)
   if (m == 'f')
   {
     //Serial.println("Going Forward");
-    if (enable_abort && checkForObstacle())
-      return 0;
+    // if (enable_abort && checkForObstacle())
+    //   return 0;
     leaveIntersection();
-    forwardAndStop();
-    updateCoor();
+    if (forwardAndStop())
+    {
+      updateCoor();
+    }
+    else if (enable_abort)
+    {
+      abortMove();
+      return 0;
+    }
   }
   else if (m == 'l')
   {
@@ -57,10 +64,17 @@ int performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-    if (enable_abort && checkForObstacle())
+    // if (enable_abort && checkForObstacle())
+    //   return 0;
+    if (forwardAndStop())
+    {
+      updateCoor();
+    }
+    else if (enable_abort)
+    {
+      abortMove();
       return 0;
-    forwardAndStop();
-    updateCoor();
+    }
   }
   else if (m == 'r')
   {
@@ -68,10 +82,17 @@ int performAction(char m)
     turnRight();
     finishTurn();
     orientation = (orientation == 3) ? 0 : (orientation + 1);
-    if (enable_abort && checkForObstacle())
+    // if (enable_abort && checkForObstacle())
+    //   return 0;
+    if (forwardAndStop())
+    {
+      updateCoor();
+    }
+    else if (enable_abort)
+    {
+      abortMove();
       return 0;
-    forwardAndStop();
-    updateCoor();
+    }
   }
   else if (m == 't')
   {
@@ -82,10 +103,19 @@ int performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
-    if (enable_abort && checkForObstacle())
+    // if (enable_abort && checkForObstacle())
+    //   return 0;
+    // forwardAndStop();
+    // updateCoor();
+    if (forwardAndStop())
+    {
+      updateCoor();
+    }
+    else if (enable_abort)
+    {
+      abortMove();
       return 0;
-    forwardAndStop();
-    updateCoor();
+    }
   }
   else
   {
@@ -98,6 +128,33 @@ bool checkForObstacle()
 {
   fft_at_intersection();
   return (fft_detect);
+}
+
+int toNextSquare()
+{
+  if (forwardAndStop())
+  {
+    updateCoor();
+    return 1;
+  }
+  //aborted movement
+  else
+  {
+    turnAround();
+    forwardAndStop();
+    orientation = (orientation == 0) ? 3 : orientation - 1;
+    orientation = (orientation == 0) ? 3 : orientation - 1;
+  }
+}
+/**
+ * Turn around and go back to where you came from
+ */
+void abortMove()
+{
+  turnAround();
+  forwardAndStop();
+  orientation = (orientation == 0) ? 3 : orientation - 1;
+  orientation = (orientation == 0) ? 3 : orientation - 1;
 }
 
 //adds new stuff to the frontier at x,y [Order: R,L,F].
