@@ -144,12 +144,12 @@ int readForwardWallClose()
 {
   //delay(5);
   int val = 0;
-  for (int i = 0; i < 2; i++)
+  for (int i = 0; i < 5; i++)
   {
     val += analogRead(frontWallSensor);
   }
-  val = val / 2;
-  if (val > 200)
+  val = val / 5;
+  if (val > 250)
   {
     //digitalWrite(frontWallLED, HIGH);
     return 1;

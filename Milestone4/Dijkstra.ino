@@ -408,6 +408,7 @@ void dijkstra(int start_pos)
     }
   }
   //have found nothing new
+  clearQueue(); //clear frontier memory
   constructMovements(&start); //is this necessary?
   return;
 }

@@ -2,6 +2,7 @@
  * Functions controlling robot movement
  * 
  */
+#define wall_cycle 49
 
 void finishTurn()
 {
@@ -35,6 +36,7 @@ void forwardUntilOffIntersection()
 int forwardAndStop()
 {
   int i = 0;
+  int j = 0;
   while (readLeftmostSensor() == 1 || readRightmostSensor() == 1)
   {
 
@@ -68,6 +70,17 @@ int forwardAndStop()
     else
     {
       i++;
+    }
+    //don't crash into walls (hopefully)
+    if(j == wall_cycle) {
+      while(readForwardWallClose()) {
+        stopMovement();
+        delay(10);
+      }
+      j = 0;
+    }
+    else {
+      j++;
     }
   }
   stopMovement();
