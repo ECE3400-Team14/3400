@@ -55,6 +55,7 @@ int performAction(char m)
     else if (enable_abort)
     {
       detected_robot = nextCoor(x,y,orientation);//avoid this spot next time
+      robot_detected = true;
       abortMove();
       return 0;
     }
@@ -74,6 +75,7 @@ int performAction(char m)
     else if (enable_abort)
     {
       detected_robot = nextCoor(x,y,orientation);//avoid this spot next time
+      robot_detected = true;
       abortMove();
       return 0;
     }
@@ -93,6 +95,7 @@ int performAction(char m)
     else if (enable_abort)
     {
       detected_robot = nextCoor(x,y,orientation);//avoid this spot next time
+      robot_detected = true;
       abortMove();
       return 0;
     }
@@ -117,6 +120,7 @@ int performAction(char m)
     else if (enable_abort)
     {
       detected_robot = nextCoor(x,y,orientation);//avoid this spot next time
+      robot_detected = true;
       abortMove();
       return 0;
     }
@@ -125,6 +129,7 @@ int performAction(char m)
   {
     stopMovement();
   }
+  robot_detected = false;//no robot encountered
   return 1;
 }
 
@@ -367,8 +372,8 @@ char get_next_move(int x, int y, int new_x, int new_y, int orientation)
  */
 bool canGoForward(int x, int y, int orientation)
 {
-  if(avoid_robot) {
-    if(fft_detect && nextCoor(x,y,orientation) == detected_robot) return false;
+  if(avoid_robot && robot_detected) {
+    if(nextCoor(x,y,orientation) == detected_robot) return false;
   }
   if (orientation == 0 && getNorthWall(x, y) == 0)
   {
@@ -396,9 +401,9 @@ bool canGoForward(int x, int y, int orientation)
  */
 bool canGoLeft(int x, int y, int orientation)
 {
-  if(avoid_robot) {
+  if(avoid_robot && robot_detected) {
     int next_orientation = (orientation == 0) ? 3 : orientation - 1;
-    if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
+    if(nextCoor(x,y,next_orientation) == detected_robot) return false;
   }
   if (orientation == 0 && getWestWall(x, y) == 0)
   {
@@ -426,9 +431,9 @@ bool canGoLeft(int x, int y, int orientation)
  */
 bool canGoRight(int x, int y, int orientation)
 {
-  if(avoid_robot) {
+  if(avoid_robot && robot_detected) {
     int next_orientation = (orientation == 3) ? 0 : orientation + 1;
-    if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
+    if(nextCoor(x,y,next_orientation) == detected_robot) return false;
   }
   if (orientation == 0 && getEastWall(x, y) == 0)
   {
@@ -451,10 +456,10 @@ bool canGoRight(int x, int y, int orientation)
 
 bool canGoBackwards(int x, int y, int orientation)
 {
-  if(avoid_robot) {
+  if(avoid_robot && robot_detected) {
     int next_orientation = (orientation == 3) ? 0 : orientation + 1;
     next_orientation = (next_orientation == 3) ? 0 : next_orientation + 1;
-    if(fft_detect && nextCoor(x,y,next_orientation) == detected_robot) return false;
+    if(nextCoor(x,y,next_orientation) == detected_robot) return false;
   }
   if (orientation == 0 && getSouthWall(x, y) == 0)
   {

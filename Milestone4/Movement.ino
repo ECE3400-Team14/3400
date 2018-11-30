@@ -48,7 +48,7 @@ int forwardAndStop()
       if (debug)
         Serial.println("Running fft");
       fft_analyze();
-      if (enable_abort && (fft_detect /*|| readForwardWallClose()*/))
+      if (enable_abort && (fft_detect /*|| readForwardWallClose())*/))
       {
         //abort
         stopMovement();
@@ -80,7 +80,7 @@ int forwardAndStop()
 void turnAround()
 {
   turnLeft();
-  delay(600); //delay subject to change
+  delay(750); //delay subject to change
   while (readLeftSensor() == 1 || readRightSensor() == 1)
     ;
   stopMovement();

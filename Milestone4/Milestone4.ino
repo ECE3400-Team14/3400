@@ -2,6 +2,9 @@
 const bool debug = false;
 const bool transmit = true;
 
+const bool debug1 = false;
+const bool debug2 = true;
+
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
  * 
@@ -35,10 +38,11 @@ bool has_started = false; //false: wait for audio signal
 
 int detected_robot = -1;        //the approximate coordinates of a detected robot (if found), -1 by default
 const bool enable_abort = true; //enables/disables movement aborts
+bool robot_detected = false;//true if robot was detected
 //maze data
 
-#define rowLength 5 //y
-#define colLength 4 //x
+#define rowLength 9 //y
+#define colLength 9 //x
 
 const byte mazeSize = rowLength * colLength;
 
@@ -118,7 +122,7 @@ void loop()
   //debug
   else
   {
-
+  if(debug1) {
     //forwardAndStop();
     //backwardsAndStop();
     //stopMovement();
@@ -150,6 +154,9 @@ void loop()
     //    Serial.print(" ");
     //    Serial.print("RW:");
     //    Serial.print(hasRightWall);
+    Serial.print(" ");
+    Serial.print("CloseWall:");
+    Serial.print(readForwardWallClose());
     updateMaze();
     Serial.print(" | ");
     Serial.print("Left:");
@@ -163,22 +170,25 @@ void loop()
     Serial.print(" ");
 
     //Serial.println();
-    //    Serial.print(", ");
-    //    fft_analyze();
+    Serial.print(", ");
+    fft_analyze();
     Serial.println();
     Serial.println();
+  }
+  else if (debug2) {
     //orientation code:
-    //       updateCoor();
-    //       Serial.print("Orientation:");
-    //       Serial.println(orientation);
-    //       Serial.print(x);
-    //       Serial.print(", ");
-    //       Serial.print(y);
-    //       Serial.println();
-    //       orientation = (orientation == 0) ? 3 : orientation - 1;
-    //       updateMaze();
-    //       sendMaze();
-    //       delay(1000);
+           updateCoor();
+           Serial.print("Orientation:");
+           Serial.println(orientation);
+           Serial.print(x);
+           Serial.print(", ");
+           Serial.print(y);
+           Serial.println();
+           orientation = (orientation == 0) ? 3 : orientation - 1;
+           updateMaze();
+           sendMaze();
+           delay(1000);
+  }
   }
 }
 
@@ -325,7 +335,7 @@ int fft_at_intersection()
 void dijkstra_search()
 {
   updateMaze(); //analyze walls, set square as explored
-  if (transmit && hasMoved())
+  if (transmit /*&& hasMoved()*/)
   {
     sendMaze();
   }                            //send new maze data
