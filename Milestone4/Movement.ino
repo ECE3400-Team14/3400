@@ -2,7 +2,7 @@
  * Functions controlling robot movement
  * 
  */
-#define wall_cycle 49
+#define wall_cycle 44
 
 void finishTurn()
 {

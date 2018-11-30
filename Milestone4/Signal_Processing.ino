@@ -14,7 +14,7 @@ const byte IR_threshold = 80;//67
 //Audio FFT Variables
 const byte threshold = 110;//the monitored signal bin amplitude threshold for detection (100)
 byte start_count = 0;// counter for keeping track of back-to-back detections
-const byte count_max = 10;// the number of back-to-back detections for a confirmed detection
+const byte count_max = 20;// the number of back-to-back detections for a confirmed detection
 
 //int mux_pin = 6; //TODO: change this port to the desired mux pin. LOW = Audio, HIGH = IR
 

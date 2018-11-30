@@ -2,8 +2,8 @@
 const bool debug = false;
 const bool transmit = true;
 
-const bool debug1 = false;
-const bool debug2 = true;
+const bool debug1 = true;
+const bool debug2 = false;
 
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
@@ -172,6 +172,13 @@ void loop()
     //Serial.println();
     Serial.print(", ");
     fft_analyze();
+    if(fft_detect) {
+      detected_robot = nextCoor(x,y,orientation);//avoid this spot next time
+      robot_detected = true;
+    }
+    else {
+      robot_detected = false;
+    }
     Serial.println();
     Serial.println();
   }

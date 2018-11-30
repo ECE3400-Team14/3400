@@ -149,7 +149,7 @@ int readForwardWallClose()
     val += analogRead(frontWallSensor);
   }
   val = val / 5;
-  if (val > 250)
+  if (val > 280)
   {
     //digitalWrite(frontWallLED, HIGH);
     return 1;
