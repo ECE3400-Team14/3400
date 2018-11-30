@@ -6,6 +6,7 @@ const bool print_data = false;
 #define switch_length 2
 #define sig 2//signal pin 2
 #define data A3//data pin A3
+#define max_val_count 64//maximum number of validation tries before exiting
 
 void setupComm() {
   pinMode(sig, OUTPUT);
@@ -15,38 +16,26 @@ void setupComm() {
 
 void readShape() {
   shape_data = 0;//reset shape data
-  //delay(wait_time);
-//  check data line
-//  if(readData()) {
-//    //shape detected
-//    //fill data [SSC]
-//    for(int i = 0; i < 3; i++) {
-//      switchSig();
-//      bitWrite(shape_data, i,readData());
-//    }
-//    switchSig();//reset
-//    analyzeShape();
-//  }
-//  else {
-//    Serial.print("No Shape Detected");
-//  }
 
 //  switchSig();
 //  int data = readData();
 //  Serial.print(data);
   
-  
-  validate();
-  int shape1 = get_shape();
-  if(!data_break()) return readShape();
-  int shape2 = get_shape();
-  if(!data_break()) return readShape();
-  if(shape1 == shape2) {
-    shape_data = shape1;
-    analyzeShape();
+  if(validate()) {
+    int shape1 = get_shape();
+    if(!data_break()) return readShape();
+    int shape2 = get_shape();
+    if(!data_break()) return readShape();
+    if(shape1 == shape2) {
+      shape_data = shape1;
+      analyzeShape();
+    }
+    else {
+      return readShape();
+    }
   }
   else {
-    return readShape();
+    Serial.print("Validation Failed");
   }
   Serial.println();
   //switchSig();//reset
@@ -76,11 +65,12 @@ int get_shape() {
   return shape_data;
 }
 
-void validate() {
+bool validate() {
+  int try_count = 0;
   bool valid = false;
   int c = 0;
   if(print_data) Serial.print("Validating");
-  while (!valid) {
+  while (!valid && try_count < max_val_count) {
     switchSig();
     int data = readData();
     if(print_data) Serial.print(data);
@@ -88,19 +78,15 @@ void validate() {
     else if ( (c < 5 && data == 0) || (c == 5 && data == 1)) c++;
     if(c == 6) {
       valid = true;
+      return true;
     }
-//    Serial.print("(c:");
-//    Serial.print(c);
-//    Serial.print(")");
+    try_count++;
   }
-  return;
+  return false;
 }
 
 
 byte readData() {
-//  int val = analogRead(data);
-//  if(val > 500) return 1;
-//  return 0;
   return digitalRead(data);
 }
 

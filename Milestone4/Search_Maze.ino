@@ -5,6 +5,8 @@
 
 const bool avoid_robot = true;//avoid the space where robot was last in next search
 
+bool did_move = false;//true if coordinates changed after an abort
+
 //once moves to next node have been created, run all of the moves in the movement stack
 void moveToNextUnexplored()
 {
@@ -19,6 +21,14 @@ void moveToNextUnexplored()
       //abort
       clearMovementStack();
     }
+
+    //update maze data (TODO: do this here or before: This allows for corrections)
+    //updateMaze(); //analyze walls, set square as explored
+    if (transmit && hasMoved())
+    {
+      sendMaze();
+    }   //send new maze data
+    
   }
 }
 
@@ -38,6 +48,7 @@ void clearMovementStack()
 //returns 1 if action was performed successfully, 0 if action was aborted
 int performAction(char m)
 {
+  did_move = false;//reset
   prev_x = x;
   prev_y = y;
   //TODO: if going to run into wall, return
@@ -165,7 +176,11 @@ void abortMove()
   orientation = (orientation == 0) ? 3 : orientation - 1;
   if (forwardAndStop() == 0)
   {
+    did_move = !did_move;//indicate reversed course
     return abortMove(); //try this again
+  }
+  if(did_move) {
+    updateCoor();//ended up moving forward: update coordinates
   }
 }
 

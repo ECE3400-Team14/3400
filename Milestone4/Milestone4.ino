@@ -36,6 +36,8 @@ const int fft_intersection_cycles = 3;
 bool fft_detect = false;  //starting state of fft
 bool has_started = false; //false: wait for audio signal
 
+bool left_start = false;//indicates if robot has left start
+
 int detected_robot = -1;        //the approximate coordinates of a detected robot (if found), -1 by default
 const bool enable_abort = true; //enables/disables movement aborts
 bool robot_detected = false;//true if robot was detected
@@ -279,16 +281,20 @@ void updateMaze()
     setEastWall(x, y, hasRightWall);
     setWestWall(x, y, hasLeftWall);
     //robot starts with wall behind it
-    if (x == start_x && y == start_y)
+    if (!left_start && x == start_x && y == start_y) {
       setSouthWall(x, y, 1);
+      left_start = true; 
+    }
   }
   else if (orientation == 1)
   {
     setEastWall(x, y, hasFrontWall);
     setSouthWall(x, y, hasRightWall);
     setNorthWall(x, y, hasLeftWall);
-    if (x == start_x && y == start_y)
+    if (!left_start && x == start_x && y == start_y) {
       setWestWall(x, y, 1); //robot starts with wall behind it
+       left_start = true; 
+    }
     //setWestWall(x,y,0);
   }
   else if (orientation == 2)
@@ -297,8 +303,10 @@ void updateMaze()
     setWestWall(x, y, hasRightWall);
     setEastWall(x, y, hasLeftWall);
     //setNorthWall(x,y,0);
-    if (x == start_x && y == start_y)
+    if (!left_start && x == start_x && y == start_y) {
       setNorthWall(x, y, 1); //robot starts with wall behind it
+      left_start = true; 
+    }
   }
   else
   {
@@ -306,8 +314,10 @@ void updateMaze()
     setNorthWall(x, y, hasRightWall);
     setSouthWall(x, y, hasLeftWall);
     //setEastWall(x,y,0);
-    if (x == start_x && y == start_y)
+    if (!left_start && x == start_x && y == start_y) {
       setEastWall(x, y, 1); //robot starts with wall behind it
+      left_start = true; 
+    }
   }
   setExplored(x, y, 1);
 
@@ -329,7 +339,7 @@ int fft_at_intersection()
   }
 }
 
-/* Is it BFS? Is it Dijkstra? It's kinda both and neither
+/* Runs Dijkstra's algorithm to move between squares
  *  Adapted from Lecture 17, Slide 14
  * 
  * At each square, this algorithm performs a search for the next closest frontier square that is accessible
@@ -341,11 +351,11 @@ int fft_at_intersection()
  */
 void dijkstra_search()
 {
-  updateMaze(); //analyze walls, set square as explored
-  if (transmit /*&& hasMoved()*/)
-  {
-    sendMaze();
-  }                            //send new maze data
+    updateMaze(); //analyze walls, set square as explored
+//  if (transmit && hasMoved())
+//  {
+//    sendMaze();
+//  }                            //send new maze data
   dijkstra(getPosition(x, y)); //find the closest frontier square and create a path to it
   moveToNextUnexplored();      //perform set of actions gererated by dijkstra
 }

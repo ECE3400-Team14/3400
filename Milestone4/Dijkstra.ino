@@ -420,11 +420,11 @@ void constructMovements(struct Node *v)
   {
     //char next_move = v->move;
     char next_move = getMove(v);
-    Serial.print(next_move); //debug
-    Serial.print(" to ");
-    Serial.print(getX(v->position));
-    Serial.print(",");
-    Serial.println(getY(v->position));
+//    Serial.print(next_move); //debug
+//    Serial.print(" to ");
+//    Serial.print(getX(v->position));
+//    Serial.print(",");
+//    Serial.println(getY(v->position));
     movementStack.push(next_move);
     v = v->parent;
   }
