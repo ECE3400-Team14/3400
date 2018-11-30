@@ -30,10 +30,14 @@ void setup() {
   read_key_registers();
   set_color_matrix();
   Serial.println("The arduino has set the color matrix");
+
+  setupComm();
 }
 
 void loop(){
- }
+  delay(600);
+  readShape();
+}
 
 
 ///////// Function Definition //////////////
@@ -105,6 +109,19 @@ String OV7670_write(int start, const byte *pData, int size){
 String OV7670_write_register(int reg_address, byte data){
   return OV7670_write(reg_address, &data, 1);
  }
+
+ //FPGA
+byte read_FPGA_value(){
+  byte data = 0;
+//  Wire.beginTransmission(OV7670_I2C_ADDRESS);
+//  Wire.write(register_address);
+//  Wire.endTransmission();
+  Wire.requestFrom(/*FPGA_ADDRESS*/0,1);
+  while(Wire.available()<1);
+  data = Wire.read();
+  return data;
+}
+ ///
 
 void set_color_matrix(){
     OV7670_write_register(0x4f, 0x80);
