@@ -19,7 +19,7 @@ void setup() {
   OV7670_write_register(0x12, 0xC);//set camera pixel format and enable color bar test with 0xE disable with 0xC
   OV7670_write_register(0x14, 0x02);//automated gain ceiling of 2x
   OV7670_write_register(0x40, 0xD0);//COM15 set for RGB 565 11010000 (208) D0
-  OV7670_write_register(0x1E, 0x30); //mirror and flip
+  OV7670_write_register(0x1E, 0x20); //mirror and flip
   OV7670_write_register(0x8C, 0x2); //RGB444
   OV7670_write_register(0x42, 0x0);//COM17 enable DSP color bar
 
