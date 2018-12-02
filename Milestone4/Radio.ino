@@ -99,7 +99,7 @@ void radioSetup(void)
   radio.startListening();
 }
 
-void sendMaze()
+void sendMaze(int x, int y)
 {
   // First, stop listening so we can talk.
   radio.stopListening();

@@ -8,11 +8,16 @@
  */
 int readForwardWallSensor()
 {
+  //111
+  digitalWrite(mux0, HIGH);
+  digitalWrite(mux1, HIGH);
+  digitalWrite(mux2, HIGH);
+  delay(muxReadDelay);
   //delay(5);
   int val = 0;
   for (int i = 0; i < 5; i++)
   {
-    val += analogRead(frontWallSensor);
+    val += analogRead(muxRead);//frontWallSensor
   }
   val = val / 5;
   if (val > 130)
@@ -44,21 +49,26 @@ int readForwardWallSensor()
  */
 int readRightWallSensor()
 {
+   //100
+  digitalWrite(mux0, LOW);
+  digitalWrite(mux1, LOW);
+  digitalWrite(mux2, HIGH);
+  delay(muxReadDelay);
   //delay(5);
   int val = 0;
   for (int i = 0; i < 10; i++)
   {
-    val += analogRead(rightWallSensor);
+    val += analogRead(muxRead);//rightWallSensor
   }
   val = val / 10;
   if (val > 160)
   {
-    digitalWrite(rightWallLED, HIGH);
+   // digitalWrite(rightWallLED, HIGH);
     return 1;
   }
   else
   {
-    digitalWrite(rightWallLED, LOW);
+    //digitalWrite(rightWallLED, LOW);
     return 0;
   }
   //  delay(5);
@@ -78,10 +88,15 @@ int readRightWallSensor()
 int readLeftWallSensor()
 {
   //delay(5);
+   //101
+  digitalWrite(mux0, HIGH);
+  digitalWrite(mux1, LOW);
+  digitalWrite(mux2, HIGH);
+  delay(muxReadDelay);
   int val = 0;
   for (int i = 0; i < 5; i++)
   {
-    val += analogRead(leftWallSensor);
+    val += analogRead(muxRead);//leftWallSensor
   }
   val = val / 5;
   if (val > 150)
@@ -100,41 +115,45 @@ int readLeftSensor()
 {
   digitalWrite(mux0, LOW);
   digitalWrite(mux1, LOW);
+  digitalWrite(mux2, LOW);
   delay(muxReadDelay);
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 500 ? 1 : 0; //400
+  return val > 700 ? 1 : 0; //400,5,600
 }
 int readRightSensor()
 {
   digitalWrite(mux0, HIGH);
   digitalWrite(mux1, LOW);
+  digitalWrite(mux2, LOW);
   delay(muxReadDelay);
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 450 ? 1 : 0; //350
+  return val > 650 ? 1 : 0; //350,450,550
 }
 int readLeftmostSensor()
 {
   digitalWrite(mux0, HIGH);
   digitalWrite(mux1, HIGH);
+  digitalWrite(mux2, LOW);
   delay(muxReadDelay);
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 750 ? 1 : 0; //700
+  return val > 800? 1 : 0; //700,750,780
 }
 int readRightmostSensor()
 {
   digitalWrite(mux0, LOW);
   digitalWrite(mux1, HIGH);
+  digitalWrite(mux2, LOW);
   delay(muxReadDelay);
   int val = analogRead(muxRead);
   //Serial.print(val);
   //  Serial.print("\n");
-  return val > 700 ? 1 : 0; //570//630
+  return val > 800 ? 1 : 0; //570//630,700,750
 }
 
 /* read forward-facing sensor with high threshold (for avoiding crashes)
@@ -143,12 +162,16 @@ int readRightmostSensor()
 int readForwardWallClose()
 {
   //delay(5);
+  digitalWrite(mux0, HIGH);
+  digitalWrite(mux1, HIGH);
+  digitalWrite(mux2, HIGH);
+  delay(muxReadDelay);
   int val = 0;
-  for (int i = 0; i < 5; i++)
+  for (int i = 0; i < 2; i++)
   {
-    val += analogRead(frontWallSensor);
+    val += analogRead(muxRead);
   }
-  val = val / 5;
+  val = val / 2;
   if (val > 280)
   {
     //digitalWrite(frontWallLED, HIGH);
