@@ -1,9 +1,20 @@
-//robot settings
+/*ROBOT SETTINGS*/
 const bool debug = false;
 const bool transmit = true;
+const bool treasure = false;
 
-const bool debug1 = true;
-const bool debug2 = false;
+const int debug_mode = 0;
+/* 0: Line Sensors, Wall Sensors, Robot Detection
+ * 1: Radio (transmit circle)
+ * 2: Treasures (just read treasures)
+ */
+
+//Maze Size
+#define rowLength 5 //y
+#define colLength 4 //x
+
+
+ /////////////*************////////////////////////
 
 /* Code for running the 3400 Robot
  * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
@@ -19,11 +30,11 @@ const bool debug2 = false;
 Servo left;
 Servo right;
 #define buttonPin 0       //pin assigned to start button (NOT CURRENTLY IN USE)
-int rightWallSensor = A5; //read right wall sensor data
+//int rightWallSensor = A5; //read right wall sensor data
 //int rightWallLED = 7;     //TEMP
-int frontWallSensor = A4;
-int leftWallSensor = A1;
-int frontWallLED = 8;
+//int frontWallSensor = A4;
+//int leftWallSensor = A1;
+//int frontWallLED = 8;
 #define mux0 2        //line sensor mux input 0
 #define mux1 4        //line sensor mux input 1
 #define mux2 7        //TODO: line sensor mux input 2
@@ -47,9 +58,6 @@ bool finished_search = false; //indicates when a search is finished
 bool start_dir = false;       // false: prioritize [left] over [right]. true: prioritize [right] over [left]
 //maze data
 
-#define rowLength 4 //y
-#define colLength 5 //x
-
 const byte mazeSize = rowLength * colLength;
 
 //starting position
@@ -71,15 +79,11 @@ void setup()
   right.attach(3); //right servo pin 3
   stopMovement();
   Serial.begin(9600);
-  //  if (debug)
-  //  {
-  //
-  //  } //TEST that this works without Serial.begin, test D0 and D1
   pinMode(buttonPin, INPUT);
-  pinMode(rightWallSensor, INPUT);
-  pinMode(frontWallSensor, INPUT);
+//  pinMode(rightWallSensor, INPUT);
+//  pinMode(frontWallSensor, INPUT);
   //  pinMode(rightWallLED, OUTPUT);
-  pinMode(frontWallLED, OUTPUT);
+  //  pinMode(frontWallLED, OUTPUT);
   pinMode(mux0, OUTPUT);
   pinMode(mux1, OUTPUT);
   pinMode(mux2, OUTPUT);
@@ -88,6 +92,13 @@ void setup()
 
   //uncomment for start button
   //while(digitalRead(buttonPin)==LOW);
+
+  //fpga setup:
+  if(treasure) {
+    if(debug) Serial.println("Setting up Camera...");
+    camera_setup();
+    setupComm();//serial comm setup
+  }
 
   analogRead(1); //initialize analog
 
@@ -138,7 +149,8 @@ void loop()
   //debug
   else
   {
-    if (debug1)
+    //sensors
+    if (debug_mode == 0)
     {
       //forwardAndStop();
       //backwardsAndStop();
@@ -201,7 +213,8 @@ void loop()
       Serial.println();
       Serial.println();
     }
-    else if (debug2)
+    //radio
+    else if (debug_mode == 1)
     {
       //orientation code:
       updateCoor();
@@ -215,6 +228,11 @@ void loop()
       updateMaze();
       sendMaze(x, y);
       delay(1000);
+    }
+    //fpga/camera
+    else if(debug_mode == 2) {
+      delay(500);
+      readShape();
     }
   }
 }
@@ -343,6 +361,10 @@ void updateMaze()
     }
   }
   setExplored(x, y, 1);
+
+  if(treasure && hasRightWall) {
+    readShape();//analyze wall for treasure
+  }
   //  }
   //checking wal data [TODO: return value indicating mismatched wall read]
   //  else {

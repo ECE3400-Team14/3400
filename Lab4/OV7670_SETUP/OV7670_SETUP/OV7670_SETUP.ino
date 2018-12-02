@@ -77,7 +77,7 @@ void read_key_registers(){
   delay(100);
 }
 
-byte read_register_value(int register_address){
+byte read_register_value(byte register_address){
   byte data = 0;
   Wire.beginTransmission(OV7670_I2C_ADDRESS);
   Wire.write(register_address);
@@ -88,7 +88,7 @@ byte read_register_value(int register_address){
   return data;
 }
 
-String OV7670_write(int start, const byte *pData, int size){
+String OV7670_write(byte start, const byte *pData, int size){
     int n,error;
     Wire.beginTransmission(OV7670_I2C_ADDRESS);
     n = Wire.write(start);

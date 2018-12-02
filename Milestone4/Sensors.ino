@@ -22,12 +22,12 @@ int readForwardWallSensor()
   val = val / 5;
   if (val > 130)
   {
-    digitalWrite(frontWallLED, HIGH);
+//    digitalWrite(frontWallLED, HIGH);
     return 1;
   }
   else
   {
-    digitalWrite(frontWallLED, LOW);
+//    digitalWrite(frontWallLED, LOW);
     return 0;
   }
   //  delay(5);
@@ -179,7 +179,7 @@ int readForwardWallClose()
   }
   else
   {
-    digitalWrite(frontWallLED, LOW);
+//    digitalWrite(frontWallLED, LOW);
     return 0;
   }
 }
