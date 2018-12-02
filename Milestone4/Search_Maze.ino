@@ -142,6 +142,8 @@ int performAction(char m)
   {
     stopMovement();
   }
+  updateMaze();//update maze at new location
+  //TODO: Validate move using walls? I.e. check for explored square that walls match the previous time it was there
   robot_detected = false;//no robot encountered
   return 1;
 }

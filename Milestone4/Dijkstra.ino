@@ -279,84 +279,168 @@ void dijkstra(int start_pos)
           }
         }
       }
-      //if left is an option (turn left with not wall)
-      if (canGoLeft(getX(pos), getY(pos), getOrientation(v)))
+      if (!start_dir) //left > right
       {
-        if (debug)
-          Serial.println("CanGoLeft");
-        int next_orientation = (getOrientation(v) == 0) ? 3 : getOrientation(v) - 1; //orientation after turning left
-        int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);             //coordinate of front destination
-        //if(!visitedContains(next_pos)) {//if next coordinate is not visited
-        struct Node *check_v = getNodeByPos(next_pos);
-        if (check_v == NULL)
-        { //if next coordinate is not visited
-          //add Node with this coordinate and 'l'
-          struct Node next_v;
-          //next_v.position = pos;//keep the same position
-          next_v.position = next_pos; //the new position
-          //next_v.move = 'l';
-          setMove(&next_v, 'l'); //left to get to next position
-          //next_v.orientation = next_orientation;
-          setOrientation(&next_v, next_orientation);
-          next_v.parent = v;
-          next_v.dist = v->dist + getDist(v, &next_v); //calc distance
-          //nodeQueue->push(next_v);
-          addVisitedNode(next_v); //store this node in memory
-          //nodeQueue->push(getTopAddr());
-          priorityQueue->add(getTopAddr()); //add new item to queue
+        //if left is an option (turn left with not wall)
+        if (canGoLeft(getX(pos), getY(pos), getOrientation(v)))
+        {
+          if (debug)
+            Serial.println("CanGoLeft");
+          int next_orientation = (getOrientation(v) == 0) ? 3 : getOrientation(v) - 1; //orientation after turning left
+          int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);             //coordinate of front destination
+          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          struct Node *check_v = getNodeByPos(next_pos);
+          if (check_v == NULL)
+          { //if next coordinate is not visited
+            //add Node with this coordinate and 'l'
+            struct Node next_v;
+            //next_v.position = pos;//keep the same position
+            next_v.position = next_pos; //the new position
+            //next_v.move = 'l';
+            setMove(&next_v, 'l'); //left to get to next position
+            //next_v.orientation = next_orientation;
+            setOrientation(&next_v, next_orientation);
+            next_v.parent = v;
+            next_v.dist = v->dist + getDist(v, &next_v); //calc distance
+            //nodeQueue->push(next_v);
+            addVisitedNode(next_v); //store this node in memory
+            //nodeQueue->push(getTopAddr());
+            priorityQueue->add(getTopAddr()); //add new item to queue
+          }
+          else
+          {                                               //next_pos has path already with check_v
+            int new_dist = v->dist + getDist(v, check_v); //test new distance through v to check_v
+            if (new_dist < check_v->dist)
+            {                      //if the new distance is less
+              check_v->parent = v; //give check_v new parent
+              check_v->dist = new_dist;
+              setMove(check_v, 'l');
+              setOrientation(check_v, next_orientation);
+              //since check_v is in the priority Queue (assumed), its position will change later
+            }
+          }
         }
-        else
-        {                                               //next_pos has path already with check_v
-          int new_dist = v->dist + getDist(v, check_v); //test new distance through v to check_v
-          if (new_dist < check_v->dist)
-          {                      //if the new distance is less
-            check_v->parent = v; //give check_v new parent
-            check_v->dist = new_dist;
-            setMove(check_v, 'l');
-            setOrientation(check_v, next_orientation);
-            //since check_v is in the priority Queue (assumed), its position will change later
+
+        //if right is an option (turn right with not wall)
+        if (canGoRight(getX(pos), getY(pos), getOrientation(v)))
+        {
+          //Serial.println("CanGoRight");
+          //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
+          int next_orientation = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
+          int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);
+          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          struct Node *check_v = getNodeByPos(next_pos);
+          if (check_v == NULL)
+          { //if next coordinate is not visited
+            //add Node with this coordinate and 'r'
+            if (debug)
+              Serial.println("new node");
+            struct Node next_v;
+            //next_v.position = pos;//keep the same position
+            next_v.position = next_pos; //new position
+            //next_v.move = 'r';
+            setMove(&next_v, 'r');
+            //next_v.orientation = next_orientation;
+            setOrientation(&next_v, next_orientation);
+            next_v.parent = v;
+            next_v.dist = v->dist + getDist(v, &next_v); //calc distance
+            //nodeQueue->push(next_v);
+            addVisitedNode(next_v); //store this node in memory
+            //nodeQueue->push(getTopAddr());
+            priorityQueue->add(getTopAddr()); //add new item to queue
+          }
+          else
+          {                                               //next_pos has path already with check_v
+            int new_dist = v->dist + getDist(v, check_v); //test new distance through v to check_v
+            if (new_dist < check_v->dist)
+            {                      //if the new distance is less
+              check_v->parent = v; //give check_v new parent
+              check_v->dist = new_dist;
+              setMove(check_v, 'r');
+              setOrientation(check_v, next_orientation);
+              //since check_v is in the priority Queue (assumed), its position will change later
+            }
           }
         }
       }
-
-      //if right is an option (turn right with not wall)
-      if (canGoRight(getX(pos), getY(pos), getOrientation(v)))
-      {
-        //Serial.println("CanGoRight");
-        //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
-        int next_orientation = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
-        int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);
-        //if(!visitedContains(next_pos)) {//if next coordinate is not visited
-        struct Node *check_v = getNodeByPos(next_pos);
-        if (check_v == NULL)
-        { //if next coordinate is not visited
-          //add Node with this coordinate and 'r'
-          if (debug)
-            Serial.println("new node");
-          struct Node next_v;
-          //next_v.position = pos;//keep the same position
-          next_v.position = next_pos; //new position
-          //next_v.move = 'r';
-          setMove(&next_v, 'r');
-          //next_v.orientation = next_orientation;
-          setOrientation(&next_v, next_orientation);
-          next_v.parent = v;
-          next_v.dist = v->dist + getDist(v, &next_v); //calc distance
-          //nodeQueue->push(next_v);
-          addVisitedNode(next_v); //store this node in memory
-          //nodeQueue->push(getTopAddr());
-          priorityQueue->add(getTopAddr()); //add new item to queue
+      else
+      { //right > left
+        if (canGoRight(getX(pos), getY(pos), getOrientation(v)))
+        {
+          //Serial.println("CanGoRight");
+          //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
+          int next_orientation = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
+          int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);
+          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          struct Node *check_v = getNodeByPos(next_pos);
+          if (check_v == NULL)
+          { //if next coordinate is not visited
+            //add Node with this coordinate and 'r'
+            if (debug)
+              Serial.println("new node");
+            struct Node next_v;
+            //next_v.position = pos;//keep the same position
+            next_v.position = next_pos; //new position
+            //next_v.move = 'r';
+            setMove(&next_v, 'r');
+            //next_v.orientation = next_orientation;
+            setOrientation(&next_v, next_orientation);
+            next_v.parent = v;
+            next_v.dist = v->dist + getDist(v, &next_v); //calc distance
+            //nodeQueue->push(next_v);
+            addVisitedNode(next_v); //store this node in memory
+            //nodeQueue->push(getTopAddr());
+            priorityQueue->add(getTopAddr()); //add new item to queue
+          }
+          else
+          {                                               //next_pos has path already with check_v
+            int new_dist = v->dist + getDist(v, check_v); //test new distance through v to check_v
+            if (new_dist < check_v->dist)
+            {                      //if the new distance is less
+              check_v->parent = v; //give check_v new parent
+              check_v->dist = new_dist;
+              setMove(check_v, 'r');
+              setOrientation(check_v, next_orientation);
+              //since check_v is in the priority Queue (assumed), its position will change later
+            }
+          }
         }
-        else
-        {                                               //next_pos has path already with check_v
-          int new_dist = v->dist + getDist(v, check_v); //test new distance through v to check_v
-          if (new_dist < check_v->dist)
-          {                      //if the new distance is less
-            check_v->parent = v; //give check_v new parent
-            check_v->dist = new_dist;
-            setMove(check_v, 'r');
-            setOrientation(check_v, next_orientation);
-            //since check_v is in the priority Queue (assumed), its position will change later
+        if (canGoLeft(getX(pos), getY(pos), getOrientation(v)))
+        {
+          if (debug)
+            Serial.println("CanGoLeft");
+          int next_orientation = (getOrientation(v) == 0) ? 3 : getOrientation(v) - 1; //orientation after turning left
+          int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);             //coordinate of front destination
+          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
+          struct Node *check_v = getNodeByPos(next_pos);
+          if (check_v == NULL)
+          { //if next coordinate is not visited
+            //add Node with this coordinate and 'l'
+            struct Node next_v;
+            //next_v.position = pos;//keep the same position
+            next_v.position = next_pos; //the new position
+            //next_v.move = 'l';
+            setMove(&next_v, 'l'); //left to get to next position
+            //next_v.orientation = next_orientation;
+            setOrientation(&next_v, next_orientation);
+            next_v.parent = v;
+            next_v.dist = v->dist + getDist(v, &next_v); //calc distance
+            //nodeQueue->push(next_v);
+            addVisitedNode(next_v); //store this node in memory
+            //nodeQueue->push(getTopAddr());
+            priorityQueue->add(getTopAddr()); //add new item to queue
+          }
+          else
+          {                                               //next_pos has path already with check_v
+            int new_dist = v->dist + getDist(v, check_v); //test new distance through v to check_v
+            if (new_dist < check_v->dist)
+            {                      //if the new distance is less
+              check_v->parent = v; //give check_v new parent
+              check_v->dist = new_dist;
+              setMove(check_v, 'l');
+              setOrientation(check_v, next_orientation);
+              //since check_v is in the priority Queue (assumed), its position will change later
+            }
           }
         }
       }
@@ -408,7 +492,9 @@ void dijkstra(int start_pos)
     }
   }
   //have found nothing new
-  clearQueue(); //clear frontier memory
+  if (!robot_detected)
+    bool finished_search = true;
+  clearQueue();               //clear frontier memory
   constructMovements(&start); //is this necessary?
   return;
 }
@@ -420,11 +506,11 @@ void constructMovements(struct Node *v)
   {
     //char next_move = v->move;
     char next_move = getMove(v);
-//    Serial.print(next_move); //debug
-//    Serial.print(" to ");
-//    Serial.print(getX(v->position));
-//    Serial.print(",");
-//    Serial.println(getY(v->position));
+    //    Serial.print(next_move); //debug
+    //    Serial.print(" to ");
+    //    Serial.print(getX(v->position));
+    //    Serial.print(",");
+    //    Serial.println(getY(v->position));
     movementStack.push(next_move);
     v = v->parent;
   }

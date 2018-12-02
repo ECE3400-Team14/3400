@@ -26,7 +26,7 @@ int leftWallSensor = A1;
 int frontWallLED = 8;
 #define mux0 2        //line sensor mux input 0
 #define mux1 4        //line sensor mux input 1
-#define mux2 7 //TODO: line sensor mux input 2
+#define mux2 7        //TODO: line sensor mux input 2
 int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
 int fft_cycle = 10;   //number of movement cycles between FFT detections (see forwardAndStop())
@@ -37,11 +37,14 @@ const int fft_intersection_cycles = 3;
 bool fft_detect = false;  //starting state of fft
 bool has_started = false; //false: wait for audio signal
 
-bool left_start = false;//indicates if robot has left start
+bool left_start = false; //indicates if robot has left start
 
 int detected_robot = -1;        //the approximate coordinates of a detected robot (if found), -1 by default
 const bool enable_abort = true; //enables/disables movement aborts
-bool robot_detected = false;//true if robot was detected
+bool robot_detected = false;    //true if robot was detected
+
+bool finished_search = false; //indicates when a search is finished
+bool start_dir = false;       // false: prioritize [left] over [right]. true: prioritize [right] over [left]
 //maze data
 
 #define rowLength 4 //y
@@ -75,7 +78,7 @@ void setup()
   pinMode(buttonPin, INPUT);
   pinMode(rightWallSensor, INPUT);
   pinMode(frontWallSensor, INPUT);
-//  pinMode(rightWallLED, OUTPUT);
+  //  pinMode(rightWallLED, OUTPUT);
   pinMode(frontWallLED, OUTPUT);
   pinMode(mux0, OUTPUT);
   pinMode(mux1, OUTPUT);
@@ -119,87 +122,100 @@ void loop()
 {
   if (!debug)
   {
-    //search();
-    //rightWallFollowing();
-    dijkstra_search();
+    if (!finished_search)
+    {
+      dijkstra_search();
+    }
+    else
+    {
+      //send the entire maze
+      sendFullMaze();
+      //switch to right-left search
+      start_dir = !start_dir;
+      finished_search = false;
+    }
   }
   //debug
   else
   {
-  if(debug1) {
-    //forwardAndStop();
-    //backwardsAndStop();
-    //stopMovement();
-    // troubleshooting code block:
-    int leftmost = readLeftmostSensor();
-    Serial.print("LL:");
-    Serial.print(leftmost);
-    Serial.print("|");
-    int left = readLeftSensor();
-    Serial.print("L:");
-    Serial.print(left);
-    Serial.print("|");
-    int right = readRightSensor();
-    Serial.print("R:");
-    Serial.print(right);
-    Serial.print("|");
-    int rightmost = readRightmostSensor();
-    Serial.print("RR:");
-    Serial.print(rightmost);
-    Serial.print("|");
-    //    int hasRightWall = readRightWallSensor();
-    //    int hasFrontWall = readForwardWallSensor();
-    //    int hasLeftWall = readLeftWallSensor();
-    //    Serial.print("LW:");
-    //    Serial.print(hasLeftWall);
-    //    Serial.print(" ");
-    //    Serial.print("FW:");
-    //    Serial.print(hasFrontWall);
-    //    Serial.print(" ");
-    //    Serial.print("RW:");
-    //    Serial.print(hasRightWall);
-    Serial.print(" ");
-    Serial.print("CloseWall:");
-    Serial.print(readForwardWallClose());
-    updateMaze();
-    Serial.print(" | ");
-    Serial.print("Left:");
-    Serial.print(canGoLeft(x, y, orientation));
-    Serial.print(" ");
-    Serial.print("FW:");
-    Serial.print(canGoForward(x, y, orientation));
-    Serial.print(" ");
-    Serial.print("Right:");
-    Serial.print(canGoRight(x, y, orientation));
-    Serial.print(" ");
+    if (debug1)
+    {
+      //forwardAndStop();
+      //backwardsAndStop();
+      //stopMovement();
+      // troubleshooting code block:
+      int leftmost = readLeftmostSensor();
+      Serial.print("LL:");
+      Serial.print(leftmost);
+      Serial.print("|");
+      int left = readLeftSensor();
+      Serial.print("L:");
+      Serial.print(left);
+      Serial.print("|");
+      int right = readRightSensor();
+      Serial.print("R:");
+      Serial.print(right);
+      Serial.print("|");
+      int rightmost = readRightmostSensor();
+      Serial.print("RR:");
+      Serial.print(rightmost);
+      Serial.print("|");
+      //    int hasRightWall = readRightWallSensor();
+      //    int hasFrontWall = readForwardWallSensor();
+      //    int hasLeftWall = readLeftWallSensor();
+      //    Serial.print("LW:");
+      //    Serial.print(hasLeftWall);
+      //    Serial.print(" ");
+      //    Serial.print("FW:");
+      //    Serial.print(hasFrontWall);
+      //    Serial.print(" ");
+      //    Serial.print("RW:");
+      //    Serial.print(hasRightWall);
+      Serial.print(" ");
+      Serial.print("CloseWall:");
+      Serial.print(readForwardWallClose());
+      updateMaze();
+      Serial.print(" | ");
+      Serial.print("Left:");
+      Serial.print(canGoLeft(x, y, orientation));
+      Serial.print(" ");
+      Serial.print("FW:");
+      Serial.print(canGoForward(x, y, orientation));
+      Serial.print(" ");
+      Serial.print("Right:");
+      Serial.print(canGoRight(x, y, orientation));
+      Serial.print(" ");
 
-    //Serial.println();
-    Serial.print(", ");
-    fft_analyze();
-    if(fft_detect) {
-      detected_robot = nextCoor(x,y,orientation);//avoid this spot next time
-      robot_detected = true;
+      //Serial.println();
+      Serial.print(", ");
+      fft_analyze();
+      if (fft_detect)
+      {
+        detected_robot = nextCoor(x, y, orientation); //avoid this spot next time
+        robot_detected = true;
+      }
+      else
+      {
+        robot_detected = false;
+      }
+      Serial.println();
+      Serial.println();
     }
-    else {
-      robot_detected = false;
+    else if (debug2)
+    {
+      //orientation code:
+      updateCoor();
+      Serial.print("Orientation:");
+      Serial.println(orientation);
+      Serial.print(x);
+      Serial.print(", ");
+      Serial.print(y);
+      Serial.println();
+      orientation = (orientation == 0) ? 3 : orientation - 1;
+      updateMaze();
+      sendMaze(x, y);
+      delay(1000);
     }
-    Serial.println();
-    Serial.println();
-  }
-  else if (debug2) {
-    //orientation code:
-           updateCoor();
-           Serial.print("Orientation:");
-           Serial.println(orientation);
-           Serial.print(x);
-           Serial.print(", ");
-           Serial.print(y);
-           Serial.println();
-           orientation = (orientation == 0) ? 3 : orientation - 1;
-           updateMaze();
-           sendMaze(x,y);
-           delay(1000);
-  }
   }
 }
 
@@ -211,7 +227,7 @@ void rightWallFollowing()
   updateMaze();
   if (transmit)
   {
-    sendMaze(x,y);
+    sendMaze(x, y);
   }
   if (hasRightWall == 1 && hasFrontWall == 0)
   {
@@ -277,15 +293,17 @@ void updateMaze()
   int hasFrontWall = readForwardWallSensor();
   int hasRightWall = readRightWallSensor();
   int hasLeftWall = readLeftWallSensor();
+  //  if(!isExplored(x,y)) {
   if (orientation == 0)
   {
     setNorthWall(x, y, hasFrontWall);
     setEastWall(x, y, hasRightWall);
     setWestWall(x, y, hasLeftWall);
     //robot starts with wall behind it
-    if (!left_start && x == start_x && y == start_y) {
+    if (!left_start && x == start_x && y == start_y)
+    {
       setSouthWall(x, y, 1);
-      left_start = true; 
+      left_start = true;
     }
   }
   else if (orientation == 1)
@@ -293,9 +311,10 @@ void updateMaze()
     setEastWall(x, y, hasFrontWall);
     setSouthWall(x, y, hasRightWall);
     setNorthWall(x, y, hasLeftWall);
-    if (!left_start && x == start_x && y == start_y) {
+    if (!left_start && x == start_x && y == start_y)
+    {
       setWestWall(x, y, 1); //robot starts with wall behind it
-       left_start = true; 
+      left_start = true;
     }
     //setWestWall(x,y,0);
   }
@@ -305,9 +324,10 @@ void updateMaze()
     setWestWall(x, y, hasRightWall);
     setEastWall(x, y, hasLeftWall);
     //setNorthWall(x,y,0);
-    if (!left_start && x == start_x && y == start_y) {
+    if (!left_start && x == start_x && y == start_y)
+    {
       setNorthWall(x, y, 1); //robot starts with wall behind it
-      left_start = true; 
+      left_start = true;
     }
   }
   else
@@ -316,18 +336,68 @@ void updateMaze()
     setNorthWall(x, y, hasRightWall);
     setSouthWall(x, y, hasLeftWall);
     //setEastWall(x,y,0);
-    if (!left_start && x == start_x && y == start_y) {
+    if (!left_start && x == start_x && y == start_y)
+    {
       setEastWall(x, y, 1); //robot starts with wall behind it
-      left_start = true; 
+      left_start = true;
     }
   }
   setExplored(x, y, 1);
-
-  //check for robot
-  //  fft_at_intersection();
-  //  if(fft_detect) {
-  //    //Serial.println("detect");
-  //    detected_robot = nextCoor(x,y,orientation);//set the forward coordinate as the approximate spot of a robot
+  //  }
+  //checking wal data [TODO: return value indicating mismatched wall read]
+  //  else {
+  //    if (orientation == 0)
+  //    {
+  //      bool check = true;
+  //      if(hasFrontWall != getNorthWall(x,y)) {
+  //        setNorthWall(x, y, hasFrontWall);
+  //        check = false;
+  //      }
+  //      if(hasRightWall != getEastWall(x,y)) {
+  //        setEastWall(x,y,hasEastWall);
+  //        check = false;
+  //      }
+  //      setEastWall(x, y, hasRightWall);
+  //      setWestWall(x, y, hasLeftWall);
+  //      //robot starts with wall behind it
+  //      if (!left_start && x == start_x && y == start_y) {
+  //        setSouthWall(x, y, 1);
+  //        left_start = true;
+  //      }
+  //    }
+  //    else if (orientation == 1)
+  //    {
+  //      setEastWall(x, y, hasFrontWall);
+  //      setSouthWall(x, y, hasRightWall);
+  //      setNorthWall(x, y, hasLeftWall);
+  //      if (!left_start && x == start_x && y == start_y) {
+  //        setWestWall(x, y, 1); //robot starts with wall behind it
+  //        left_start = true;
+  //      }
+  //    //setWestWall(x,y,0);
+  //    }
+  //    else if (orientation == 2)
+  //    {
+  //      setSouthWall(x, y, hasFrontWall);
+  //      setWestWall(x, y, hasRightWall);
+  //      setEastWall(x, y, hasLeftWall);
+  //      //setNorthWall(x,y,0);
+  //      if (!left_start && x == start_x && y == start_y) {
+  //       setNorthWall(x, y, 1); //robot starts with wall behind it
+  //        left_start = true;
+  //      }
+  //    }
+  //    else
+  //    {
+  //      setWestWall(x, y, hasFrontWall);
+  //      setNorthWall(x, y, hasRightWall);
+  //      setSouthWall(x, y, hasLeftWall);
+  //      //setEastWall(x,y,0);
+  //      if (!left_start && x == start_x && y == start_y) {
+  //        setEastWall(x, y, 1); //robot starts with wall behind it
+  //        left_start = true;
+  //      }
+  //    }
   //  }
 }
 
@@ -353,11 +423,11 @@ int fft_at_intersection()
  */
 void dijkstra_search()
 {
-    updateMaze(); //analyze walls, set square as explored
-//  if (transmit && hasMoved())
-//  {
-//    sendMaze();
-//  }                            //send new maze data
+  //updateMaze(); //analyze walls, set square as explored
+  //  if (transmit && hasMoved())
+  //  {
+  //    sendMaze();
+  //  }                            //send new maze data
   dijkstra(getPosition(x, y)); //find the closest frontier square and create a path to it
   moveToNextUnexplored();      //perform set of actions gererated by dijkstra
 }
@@ -369,6 +439,18 @@ void dijkstra_search()
 bool hasMoved()
 {
   return x != prev_x || y != prev_y;
+}
+
+/* 
+ * Sends all of the data in the maze
+ * 
+ */
+void sendFullMaze()
+{
+  for (int i = 0; i < mazeSize; i++)
+  {
+    sendMaze(getX(i), getY(i));
+  }
 }
 
 /* (UNIMPLEMENTED) A basic DFS/BFS search algorith*/
@@ -398,7 +480,7 @@ void bad_search()
   updateMaze();
   if (transmit)
   {
-    sendMaze(x,y);
+    sendMaze(x, y);
   }
 
   if (hasFrontWall == 0)
