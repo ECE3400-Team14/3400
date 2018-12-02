@@ -20,12 +20,13 @@ Servo left;
 Servo right;
 #define buttonPin 0       //pin assigned to start button (NOT CURRENTLY IN USE)
 int rightWallSensor = A5; //read right wall sensor data
-int rightWallLED = 7;     //TEMP
+//int rightWallLED = 7;     //TEMP
 int frontWallSensor = A4;
 int leftWallSensor = A1;
 int frontWallLED = 8;
 #define mux0 2        //line sensor mux input 0
-#define mux1 4        //line sensor mux input 2
+#define mux1 4        //line sensor mux input 1
+#define mux2 7 //TODO: line sensor mux input 2
 int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
 int fft_cycle = 10;   //number of movement cycles between FFT detections (see forwardAndStop())
@@ -43,8 +44,8 @@ const bool enable_abort = true; //enables/disables movement aborts
 bool robot_detected = false;//true if robot was detected
 //maze data
 
-#define rowLength 9 //y
-#define colLength 9 //x
+#define rowLength 4 //y
+#define colLength 5 //x
 
 const byte mazeSize = rowLength * colLength;
 
@@ -74,10 +75,11 @@ void setup()
   pinMode(buttonPin, INPUT);
   pinMode(rightWallSensor, INPUT);
   pinMode(frontWallSensor, INPUT);
-  pinMode(rightWallLED, OUTPUT);
+//  pinMode(rightWallLED, OUTPUT);
   pinMode(frontWallLED, OUTPUT);
   pinMode(mux0, OUTPUT);
   pinMode(mux1, OUTPUT);
+  pinMode(mux2, OUTPUT);
   pinMode(fft_mux_pin, OUTPUT);
   //Serial.println("Wait for button");
 
@@ -195,7 +197,7 @@ void loop()
            Serial.println();
            orientation = (orientation == 0) ? 3 : orientation - 1;
            updateMaze();
-           sendMaze();
+           sendMaze(x,y);
            delay(1000);
   }
   }
@@ -209,7 +211,7 @@ void rightWallFollowing()
   updateMaze();
   if (transmit)
   {
-    sendMaze();
+    sendMaze(x,y);
   }
   if (hasRightWall == 1 && hasFrontWall == 0)
   {
@@ -396,7 +398,7 @@ void bad_search()
   updateMaze();
   if (transmit)
   {
-    sendMaze();
+    sendMaze(x,y);
   }
 
   if (hasFrontWall == 0)

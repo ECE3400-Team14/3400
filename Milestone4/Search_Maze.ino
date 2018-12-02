@@ -16,6 +16,12 @@ void moveToNextUnexplored()
     char move = movementStack.pop();
     //    Serial.print("Move: ");
     //    Serial.println(move);
+
+    if (transmit && hasMoved())
+    {
+      sendMaze(x,y);
+    }   //send new maze data
+    
     if (performAction(move) == 0)
     {
       //abort
@@ -24,10 +30,6 @@ void moveToNextUnexplored()
 
     //update maze data (TODO: do this here or before: This allows for corrections)
     //updateMaze(); //analyze walls, set square as explored
-    if (transmit && hasMoved())
-    {
-      sendMaze();
-    }   //send new maze data
     
   }
 }
