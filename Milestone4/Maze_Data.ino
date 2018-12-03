@@ -21,9 +21,7 @@ void initMaze()
   {
     for (int yn = 0; yn < colLength; yn++)
     {
-      int coordinates = 0;
-      coordinates = coordinates | (xn | (yn << 4));
-      mazeData[xn + rowLength * yn] = coordinates;
+      mazeData[xn + rowLength * yn] = 0;
     }
   }
 }
@@ -63,6 +61,13 @@ int getWestWall(int x, int y)
 int isExplored(int x, int y)
 {
   return bitRead(mazeData[x + rowLength * y], 7);
+}
+
+int getShape(int x, int y)
+{
+  byte one = bitRead(mazeData[x + rowLength * y],5);
+  byte two = bitRead(mazeData[x + rowLength * y],6) << 1;
+  return one | two;
 }
 
 void setNorthWall(int x, int y, int valid)
@@ -106,7 +111,9 @@ void setTreasureColor(int x, int y, int color)
 // shape according to standard
 void setTreasureShape(int x, int y, int shape)
 {
-  mazeData[x + rowLength * y] |= shape << 5;
+  bitClear(mazeData[x + rowLength * y], 5);
+  bitClear(mazeData[x + rowLength * y], 6);
+  mazeData[x + rowLength * y] |= (shape << 5);
 }
 
 void setExplored(int x, int y, int valid)

@@ -50,7 +50,7 @@ void clearMovementStack()
 //returns 1 if action was performed successfully, 0 if action was aborted
 int performAction(char m)
 {
-  did_move = false;//reset
+  did_move = false;//reset (for abort)
   prev_x = x;
   prev_y = y;
   //TODO: if going to run into wall, return
@@ -142,6 +142,8 @@ int performAction(char m)
   {
     stopMovement();
   }
+  updateMaze();//update maze at new location
+  //TODO: Validate move using walls? I.e. check for explored square that walls match the previous time it was there
   robot_detected = false;//no robot encountered
   return 1;
 }
@@ -183,6 +185,7 @@ void abortMove()
   }
   if(did_move) {
     updateCoor();//ended up moving forward: update coordinates
+    updateMaze();
   }
 }
 

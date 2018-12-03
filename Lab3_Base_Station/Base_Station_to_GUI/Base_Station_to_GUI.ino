@@ -160,17 +160,17 @@ void loop(void)
         if (s) Serial.print(",south=true"); 
         if (w) Serial.print(",west=true");
         
-//        if (shape){
-//          if (shape == 3){
-//            Serial.print(",tshape=triangle");
-//          }else if (shape == 2){
-//            Serial.print(",tshape=square");
-//          }else{
-//            Serial.print(",tshape=circle");
-//          }
-//          if (color) Serial.print(",tcolor=blue");
-//          else Serial.print(",tcolor=red");
-//        }
+        if (shape != 0){
+          if (shape == 2){
+            Serial.print(",tshape=triangle");
+          } else if (shape == 3){
+            Serial.print(",tshape=square");
+          } else if(shape == 1) {
+            Serial.print(",tshape=diamond");
+          }
+          if (color) Serial.print(",tcolor=blue");
+          else Serial.print(",tcolor=red");
+        }
         Serial.print("\n");
         //Serial.println("1,1,north=true");
         //printf("x = %d, y = %d, north = %d, east = %d, south = %d, west = %d, color = %d, shape = %d, explored = %d\n",x,y,n,e,s,w,color,shape,explored);

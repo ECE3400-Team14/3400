@@ -35,6 +35,12 @@ void forwardUntilOffIntersection()
  */
 int forwardAndStop()
 {
+  //pre-check (Could this be bad?)
+//  fft_analyze();
+//  if(enable_abort && fft_detect) {
+//    stopMovement();
+//    return 0;
+//  }
   int i = 0;
   int j = 0;
   while (readLeftmostSensor() == 1 || readRightmostSensor() == 1)

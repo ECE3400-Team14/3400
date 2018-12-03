@@ -62,7 +62,7 @@ void radioSetup(void)
   //
   // Setup and configure rf radio
   //
-
+  if(debug) Serial.println("Beginning Radio");
   radio.begin();
 
   // optionally, increase the delay between retries & # of retries
