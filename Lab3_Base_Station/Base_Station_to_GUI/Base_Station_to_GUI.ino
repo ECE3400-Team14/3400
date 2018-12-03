@@ -166,7 +166,7 @@ void loop(void)
           } else if (shape == 3){
             Serial.print(",tshape=square");
           } else if(shape == 1) {
-            Serial.print(",tshape=circle");
+            Serial.print(",tshape=diamond");
           }
           if (color) Serial.print(",tcolor=blue");
           else Serial.print(",tcolor=red");

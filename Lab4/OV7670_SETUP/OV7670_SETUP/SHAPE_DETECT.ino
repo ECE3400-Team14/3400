@@ -4,8 +4,8 @@ const bool print_data = false;
 
 #define wait_time 500
 #define switch_length 2
-#define sig 2//signal pin 2
-#define data A3//data pin A3
+#define sig 8//signal pin 2
+#define data A2//data pin A3
 #define max_val_count 64//maximum number of validation tries before exiting
 
 void setupComm() {

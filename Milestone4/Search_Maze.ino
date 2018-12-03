@@ -50,7 +50,7 @@ void clearMovementStack()
 //returns 1 if action was performed successfully, 0 if action was aborted
 int performAction(char m)
 {
-  did_move = false;//reset
+  did_move = false;//reset (for abort)
   prev_x = x;
   prev_y = y;
   //TODO: if going to run into wall, return
@@ -185,6 +185,7 @@ void abortMove()
   }
   if(did_move) {
     updateCoor();//ended up moving forward: update coordinates
+    updateMaze();
   }
 }
 

@@ -142,7 +142,7 @@ int readLeftmostSensor()
   int val = analogRead(muxRead);
   //Serial.print(val);
   //Serial.print(" ");
-  return val > 800? 1 : 0; //700,750,780
+  return val > 760? 1 : 0; //700,750,780
 }
 int readRightmostSensor()
 {
@@ -153,7 +153,7 @@ int readRightmostSensor()
   int val = analogRead(muxRead);
   //Serial.print(val);
   //  Serial.print("\n");
-  return val > 800 ? 1 : 0; //570//630,700,750
+  return val > 780 ? 1 : 0; //570//630,700,750
 }
 
 /* read forward-facing sensor with high threshold (for avoiding crashes)

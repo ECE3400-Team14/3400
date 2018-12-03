@@ -2,7 +2,7 @@ byte shape_data;
 
 const bool print_data = false;
 
-#define wait_time 100
+#define wait_time 300
 #define switch_length 2
 #define sig 8//signal pin 8
 #define data A2//data pin A2
@@ -18,7 +18,7 @@ void setupComm() {
 }
 
 void readShape() {
-  //delay(wait_time)
+  delay(wait_time);
   shape_data = 0;//reset shape data
   trycount = 0;
   while (trycount < max_tries) {
@@ -120,6 +120,7 @@ void addShape(int x,int y) {
     if(debug) Serial.print("Red ");
   }
   else {
+    setTreasureShape(x, y, 0);
     if(debug) Serial.print("No Shape Detected");
     return;
   }

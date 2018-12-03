@@ -10,8 +10,8 @@ const int debug_mode = 0;
  */
 
 //Maze Size
-#define rowLength 5 //y
-#define colLength 4 //x
+#define rowLength 6 //y
+#define colLength 6 //x
 
 
  /////////////*************////////////////////////
@@ -40,7 +40,7 @@ Servo right;
 #define mux2 7        //TODO: line sensor mux input 2
 int muxRead = A3;     //line sensor input
 int muxReadDelay = 6; //ms delay before reading from the mux to handle some switching issues
-int fft_cycle = 10;   //number of movement cycles between FFT detections (see forwardAndStop())
+int fft_cycle = 12;   //number of movement cycles between FFT detections (see forwardAndStop())
 int fft_mux_pin = 6;  //pin for selecting Audio/IR signal
 const int fft_intersection_cycles = 3;
 
@@ -54,7 +54,7 @@ int detected_robot = -1;        //the approximate coordinates of a detected robo
 const bool enable_abort = true; //enables/disables movement aborts
 bool robot_detected = false;    //true if robot was detected
 
-bool finished_search = false; //indicates when a search is finished
+volatile bool finished_search = false; //indicates when a search is finished
 bool start_dir = false;       // false: prioritize [left] over [right]. true: prioritize [right] over [left]
 //maze data
 
@@ -110,25 +110,39 @@ void setup()
   digitalWrite(fft_mux_pin, LOW);
 
   //
-  while (has_started == false)
-  {
-    fft_analyze();
-    //Serial.println("Waiting");
+  if(!debug || debug_mode == 0) {
+    while (has_started == false)
+    {
+      fft_analyze();
+      //Serial.println("Waiting");
     delay(10);
+    }
+  }
+  else {
+    has_started == true;
   }
   digitalWrite(fft_mux_pin, HIGH);
   fft_analyze(); //reset
 
-  //initMaze(); (removed to save memory)
+  initMaze();
   printf_begin();
-  radioSetup();
+  if(transmit) {
+    radioSetup();//????
+  }
 
   //stack setup
   //initialize_search();
   //append_frontier(getPosition(x, y));
   //delay(10000);//delay start
+
+  //init start:
+  updateMaze();
+  if(transmit) {
+    sendMaze(x,y);
+  }
 }
 
+//LOOP
 void loop()
 {
   if (!debug)
@@ -140,9 +154,12 @@ void loop()
     else
     {
       //send the entire maze
-      sendFullMaze();
-      //switch to right-left search
-      start_dir = !start_dir;
+      if(transmit) {
+        sendFullMaze();
+      }
+      //resetSearch();//reset explored
+      initMaze();//clear maze
+      start_dir = !start_dir; //switch to right-left search
       finished_search = false;
     }
   }
@@ -225,6 +242,10 @@ void loop()
       Serial.print(y);
       Serial.println();
       orientation = (orientation == 0) ? 3 : orientation - 1;
+      if(treasure) { 
+        readShape();
+      }
+      
       updateMaze();
       sendMaze(x, y);
       delay(1000);
@@ -232,53 +253,34 @@ void loop()
     //fpga/camera
     else if(debug_mode == 2) {
       delay(500);
-      readShape();
+      if(treasure) {
+        readShape();
+      }
+      //Serial.print("Loop");
+      Serial.println();
     }
   }
 }
 
-void rightWallFollowing()
+/* Runs Dijkstra's algorithm to move between squares
+ *  Adapted from Lecture 17, Slide 14
+ * 
+ * At each square, this algorithm performs a search for the next closest frontier square that is accessible
+ * from all visited squares. 
+ * 
+ * Once this square is found, it generates the path requiring the fewest movements (1 movement = move between squares or a turn)
+ * through the explored squares and executes this path
+ * 
+ */
+void dijkstra_search()
 {
-  int hasRightWall = readRightWallSensor();
-  int hasFrontWall = readForwardWallSensor();
-  int hasLeftWall = readLeftWallSensor();
-  updateMaze();
-  if (transmit)
-  {
-    sendMaze(x, y);
-  }
-  if (hasRightWall == 1 && hasFrontWall == 0)
-  {
-    leaveIntersection();
-    forwardAndStop();
-    updateCoor();
-  }
-  else if (hasRightWall == 1 && hasFrontWall == 1 /*&&hasLeftWall==0*/)
-  {
-    turnLeft();
-    finishTurn();
-    orientation = (orientation == 0) ? 3 : orientation - 1;
-    //
-    //updateCoor();
-  }
-  //   else if (hasRightWall==1&&hasFrontWall==1&&hasLeftWall==1){
-  //    turnLeft();
-  //    finishTurn();
-  //    orientation = (orientation == 0) ? 3 : orientation - 1;
-  //    turnLeft();
-  //    finishTurn();
-  //    orientation = (orientation == 0) ? 3 : orientation - 1;
-  //    //
-  //    //updateCoor();
-  //   }
-  else if (hasRightWall == 0)
-  {
-    turnRight();
-    finishTurn();
-    orientation = (orientation == 3) ? 0 : (orientation + 1);
-    forwardAndStop();
-    updateCoor();
-  }
+  //updateMaze(); //analyze walls, set square as explored
+  //  if (transmit && hasMoved())
+  //  {
+  //    sendMaze();
+  //  }                            //send new maze data
+  dijkstra(getPosition(x, y)); //find the closest frontier square and create a path to it
+  moveToNextUnexplored();      //perform set of actions gererated by dijkstra
 }
 
 //updates current coordinates of robot
@@ -362,7 +364,7 @@ void updateMaze()
   }
   setExplored(x, y, 1);
 
-  if(treasure && hasRightWall) {
+  if(treasure && hasRightWall && getShape(x,y) == 0) {
     readShape();//analyze wall for treasure
   }
   //  }
@@ -433,27 +435,6 @@ int fft_at_intersection()
   }
 }
 
-/* Runs Dijkstra's algorithm to move between squares
- *  Adapted from Lecture 17, Slide 14
- * 
- * At each square, this algorithm performs a search for the next closest frontier square that is accessible
- * from all visited squares. 
- * 
- * Once this square is found, it generates the path requiring the fewest movements (1 movement = move between squares or a turn)
- * through the explored squares and executes this path
- * 
- */
-void dijkstra_search()
-{
-  //updateMaze(); //analyze walls, set square as explored
-  //  if (transmit && hasMoved())
-  //  {
-  //    sendMaze();
-  //  }                            //send new maze data
-  dijkstra(getPosition(x, y)); //find the closest frontier square and create a path to it
-  moveToNextUnexplored();      //perform set of actions gererated by dijkstra
-}
-
 /*
  * Returns true if the robot has moved from its previous location since the last search, or if no previous move is recorded, 
  * false otherwise.
@@ -474,6 +455,60 @@ void sendFullMaze()
     sendMaze(getX(i), getY(i));
   }
 }
+
+//make all coordinate unexplored:
+void resetSearch() {
+  for(int i = 0; i < mazeSize; i++) {
+    setExplored(getX(i), getY(i),0);
+  }
+}
+
+//OLD Search Algorithms/////
+void rightWallFollowing()
+{
+  int hasRightWall = readRightWallSensor();
+  int hasFrontWall = readForwardWallSensor();
+  int hasLeftWall = readLeftWallSensor();
+  updateMaze();
+  if (transmit)
+  {
+    sendMaze(x, y);
+  }
+  if (hasRightWall == 1 && hasFrontWall == 0)
+  {
+    leaveIntersection();
+    forwardAndStop();
+    updateCoor();
+  }
+  else if (hasRightWall == 1 && hasFrontWall == 1 /*&&hasLeftWall==0*/)
+  {
+    turnLeft();
+    finishTurn();
+    orientation = (orientation == 0) ? 3 : orientation - 1;
+    //
+    //updateCoor();
+  }
+  //   else if (hasRightWall==1&&hasFrontWall==1&&hasLeftWall==1){
+  //    turnLeft();
+  //    finishTurn();
+  //    orientation = (orientation == 0) ? 3 : orientation - 1;
+  //    turnLeft();
+  //    finishTurn();
+  //    orientation = (orientation == 0) ? 3 : orientation - 1;
+  //    //
+  //    //updateCoor();
+  //   }
+  else if (hasRightWall == 0)
+  {
+    turnRight();
+    finishTurn();
+    orientation = (orientation == 3) ? 0 : (orientation + 1);
+    forwardAndStop();
+    updateCoor();
+  }
+}
+
+
 
 /* (UNIMPLEMENTED) A basic DFS/BFS search algorith*/
 void search()
