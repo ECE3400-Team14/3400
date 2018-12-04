@@ -493,7 +493,7 @@ void dijkstra(int start_pos)
   }
   //have found nothing new
   if (!robot_detected)
-    bool finished_search = true;
+    finished_search = true;
   clearQueue();               //clear frontier memory
   constructMovements(&start); //is this necessary?
   return;
