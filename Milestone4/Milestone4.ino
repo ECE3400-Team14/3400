@@ -1,7 +1,7 @@
 /*ROBOT SETTINGS*/
 const bool debug = false;
 const bool transmit = true;
-const bool treasure = false;
+const bool treasure = true;
 
 const int debug_mode = 0;
 /* 0: Line Sensors, Wall Sensors, Robot Detection
@@ -10,8 +10,8 @@ const int debug_mode = 0;
  */
 
 //Maze Size
-#define rowLength 6 //y
-#define colLength 6 //x
+#define rowLength 9 //y
+#define colLength 9 //x
 
 
  /////////////*************////////////////////////
@@ -115,7 +115,7 @@ void setup()
     {
       fft_analyze();
       //Serial.println("Waiting");
-    delay(10);
+    delay(5);
     }
   }
   else {
@@ -157,8 +157,8 @@ void loop()
       if(transmit) {
         sendFullMaze();
       }
-      //resetSearch();//reset explored
-      initMaze();//clear maze
+      resetSearch();//reset explored
+      //initMaze();//clear maze
       start_dir = !start_dir; //switch to right-left search
       finished_search = false;
     }
@@ -247,7 +247,9 @@ void loop()
       }
       
       updateMaze();
-      sendMaze(x, y);
+      if(transmit) {
+        sendMaze(x, y);
+      }
       delay(1000);
     }
     //fpga/camera

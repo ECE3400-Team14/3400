@@ -161,13 +161,13 @@ void loop(void)
         if (w) Serial.print(",west=true");
         
         if (shape != 0){
-          if (shape == 2){
-            Serial.print(",tshape=triangle");
-          } else if (shape == 3){
-            Serial.print(",tshape=square");
-          } else if(shape == 1) {
-            Serial.print(",tshape=diamond");
-          }
+//          if (shape == 2){
+//            Serial.print(",tshape=triangle");
+//          } else if (shape == 3){
+//            Serial.print(",tshape=square");
+//          } else if(shape == 1) {
+//            Serial.print(",tshape=diamond");
+//          }
           if (color) Serial.print(",tcolor=blue");
           else Serial.print(",tcolor=red");
         }

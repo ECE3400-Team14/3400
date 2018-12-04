@@ -2,7 +2,7 @@ byte shape_data;
 
 const bool print_data = false;
 
-#define wait_time 300
+#define wait_time 50
 #define switch_length 2
 #define sig 8//signal pin 8
 #define data A2//data pin A2
@@ -18,7 +18,7 @@ void setupComm() {
 }
 
 void readShape() {
-  delay(wait_time);
+  //delay(wait_time);
   shape_data = 0;//reset shape data
   trycount = 0;
   while (trycount < max_tries) {
