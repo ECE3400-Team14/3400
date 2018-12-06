@@ -15,6 +15,10 @@
  * node can then see how long the whole cycle took.
  */
 
+/**
+  * Modifications made by: Gregory Kaiser (ghk48), Andrew Lin (yl656), David Burgstahler (dfb93)  
+ */
+
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
