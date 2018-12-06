@@ -1,7 +1,8 @@
 /**
  * FFT analysis code for Audio and IR signal analysis
  * Based off example sketch fft_adc_serial provided by the FFT library
- * Written by: David Burgstahler (dfb93), Gregory Kaiser (ghk48)
+ * Written by: David Burgstahler (dfb93), Gregory Kaiser (ghk48) [Audio]
+ *             Andrew Lin (yl656) [IR]
  */
 
 #define LOG_OUT 1 // use the log output function
