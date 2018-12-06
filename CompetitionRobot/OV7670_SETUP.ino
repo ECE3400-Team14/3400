@@ -3,8 +3,11 @@
  * BEFORE RUNNING THIS FILE: Disable pullup resistors on SDA and SCL in the Wire Library:
  * see https://cei-lab.github.io/ece3400-2018/lab4.html
  * 
+ * NOTE: For less memory usage from the Wire library, change TWI_BUFFER_LENGTH from 32 to 16 in twi.h
+ * 
  * Modified by: Gregory Kaiser (ghk48), Michaelangelo Rodriguez Ayala (mr2242), David Burgstahler (dfb93), 
  */
+
 
 #include <Wire.h>
 
