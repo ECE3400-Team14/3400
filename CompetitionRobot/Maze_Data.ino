@@ -1,10 +1,10 @@
 /*
  * Functions for storing, setting, and getting maze data
+ * Written by: Andrew Lin (yl656), Gregory Kaiser (ghk48),  David Burgstahler (dfb93) 
  */
 
 byte mazeData[mazeSize]; //index = x + rowLength*y
-
-/*
+/* Maze Data Structure: 
  * N[0]
  * E[1]
  * S[2]
@@ -14,7 +14,7 @@ byte mazeData[mazeSize]; //index = x + rowLength*y
  * explored[7]
  */
 
-//not necessary (DEPRICATED)
+//initialize maze data with all zeros
 void initMaze()
 {
   for (int xn = 0; xn < rowLength; xn++)
@@ -26,8 +26,10 @@ void initMaze()
   }
 }
 
+//converts x and y to array index of [mazeData]
 int getPosition(int x, int y) { return x + rowLength * y; }
 
+//converts array index of [mazeData] to an x and y coordinate
 int getX(int c) { return c % rowLength; }
 int getY(int c) { return c / rowLength; }
 
@@ -40,7 +42,8 @@ int getY(int c) { return c / rowLength; }
 //  | ( getWestWall(x1,y1) | getEastWall(x2,y2) );
 //}
 
-//need getter functions
+//mazeData getter functions:
+
 int getNorthWall(int x, int y)
 {
   return bitRead(mazeData[x + rowLength * y], 0);
@@ -65,10 +68,12 @@ int isExplored(int x, int y)
 
 int getShape(int x, int y)
 {
-  byte one = bitRead(mazeData[x + rowLength * y],5);
-  byte two = bitRead(mazeData[x + rowLength * y],6) << 1;
+  byte one = bitRead(mazeData[x + rowLength * y], 5);
+  byte two = bitRead(mazeData[x + rowLength * y], 6) << 1;
   return one | two;
 }
+
+//mazeData setter functions:
 
 void setNorthWall(int x, int y, int valid)
 {
@@ -100,6 +105,7 @@ void setWestWall(int x, int y, int valid)
   else
     bitClear(mazeData[x + rowLength * y], 3);
 }
+
 //0 is red, 1 is blue
 void setTreasureColor(int x, int y, int color)
 {
@@ -108,6 +114,7 @@ void setTreasureColor(int x, int y, int color)
   else
     bitClear(mazeData[x + rowLength * y], 4);
 }
+
 // shape according to standard
 void setTreasureShape(int x, int y, int shape)
 {

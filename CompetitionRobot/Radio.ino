@@ -15,6 +15,11 @@
  * node can then see how long the whole cycle took.
  */
 
+/**
+ * Modifications made to receive maze data from our robot
+ * Modified by: Gregory Kaiser (ghk48), Andrew Lin (yl656), David Burgstahler (dfb93)
+ */
+
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
@@ -62,7 +67,8 @@ void radioSetup(void)
   //
   // Setup and configure rf radio
   //
-  if(debug) Serial.println("Beginning Radio");
+  if (debug)
+    Serial.println("Beginning Radio");
   radio.begin();
 
   // optionally, increase the delay between retries & # of retries
@@ -109,9 +115,10 @@ void sendMaze(int x, int y)
   //bool ok = radio.write( mazeData+x+rowLength*y, sizeof(unsigned int) );
   bool ok = radio.write(&data, sizeof(unsigned int));
   if (ok)
-    if (debug) Serial.println("ok...");
-  else
-    if (debug) Serial.print("failed.\n\r");
+    if (debug)
+      Serial.println("ok...");
+    else if (debug)
+      Serial.print("failed.\n\r");
 
   // Now, continue listening
   radio.startListening();
@@ -126,7 +133,8 @@ void sendMaze(int x, int y)
   // if timed out, resend
   if (timeout)
   {
-    if (debug) Serial.print("Failed, response timed out.\n\r");
+    if (debug)
+      Serial.print("Failed, response timed out.\n\r");
     //sendMaze();
   }
 }

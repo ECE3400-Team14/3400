@@ -1,3 +1,11 @@
+/** Modifications to 0V7670 setup file provided by ECE 3400 Staff with camera register values
+ * 
+ * BEFORE RUNNING THIS FILE: Disable pullup resistors on SDA and SCL in the Wire Library:
+ * see https://cei-lab.github.io/ece3400-2018/lab4.html
+ * 
+ * Modified by: Gregory Kaiser (ghk48), Michaelangelo Rodriguez Ayala (mr2242), David Burgstahler (dfb93), 
+ */
+
 #include <Wire.h>
 
 #define OV7670_I2C_ADDRESS 0x21 /*TODO: write this in hex (eg. 0xAB) */
@@ -20,13 +28,9 @@ void camera_setup()
   OV7670_write_register(0x12, 0xC);  //set camera pixel format and enable color bar test with 0xE disable with 0xC
   OV7670_write_register(0x14, 0x02); //automated gain ceiling of 2x
   OV7670_write_register(0x40, 0xD0); //COM15 set for RGB 565 11010000 (208) D0
-  //OV7670_write_register(0x1E, 0x30); //mirror and flip
-  OV7670_write_register(0x8C, 0x2);  //RGB444
-  OV7670_write_register(0x42, 0x0);  //COM17 enable DSP color bar
-
-  //OV7670_write_register(0x01, 0x90);//adjust blue gain
-  //OV7670_write_register(0xBE, 0x90);//black level comp (blue)
-  //OV7670_write_register(0x55, 0x30);//brightness?
+  //OV7670_write_register(0x1E, 0x30); //mirror and flip (our camera was upside down, so we did not use this)
+  OV7670_write_register(0x8C, 0x2); //RGB444
+  OV7670_write_register(0x42, 0x0); //COM17 enable DSP color bar
 
   if (debug)
     read_key_registers();
@@ -96,18 +100,19 @@ int OV7670_write(byte start, const byte *pData, int size)
   n = Wire.write(start);
   if (n != 1)
   {
-    return 0;//return "ES";
+    return 0; //return "ES";
   }
   n = Wire.write(pData, size);
   if (n != size)
   {
-    return 0;//return "EW";
+    return 0; //return "EW";
   }
   error = Wire.endTransmission(true);
   if (error != 0)
   {
-    if(debug) Serial.println(error);
-    0;//return String(error);
+    if (debug)
+      Serial.println(error);
+    0; //return String(error);
   }
   return 1;
 }

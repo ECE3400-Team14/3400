@@ -1,7 +1,13 @@
+/* Code for running the 3400 Robot
+ * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
+ * 
+ * Written by: David Burgstahler (dfb93), Gregory Kaiser (ghk48), Andrew Lin (yl656), and Michaelangelo Rodriguez Ayala (mr2242)
+ */
+
 /*ROBOT SETTINGS*/
 const bool debug = false;
-const bool transmit = true;//true: transmits maze data via. radio
-const bool treasure = true;//true: detects treasures
+const bool transmit = true; //true: transmits maze data via. radio
+const bool treasure = true; //true: detects treasures
 
 const int debug_mode = 2;
 /* 0: Line Sensors, Wall Sensors, Robot Detection
@@ -13,21 +19,15 @@ const int debug_mode = 2;
 #define rowLength 9 //maximum y + 1
 #define colLength 9 //maximum x + 1
 
+/////////////*************////////////////////////
 
- /////////////*************////////////////////////
-
-/* Code for running the 3400 Robot
- * This file contains global fields, as well as logic for searching algorithms and debugging the robot.
- * 
- * Written by: David Burgstahler (dfb93), Gregory Kaiser (ghk48), Andrew Lin (yl656), and Michaelangelo Rodriguez Ayala (mr2242)
- */
 #include <LinkedList.h>
 #include <StackArray.h>
 #include <Servo.h>
 #include "printf.h"
 Servo left;
 Servo right;
-#define buttonPin 0       //pin assigned to start button (NOT CURRENTLY IN USE)
+#define buttonPin 0   //pin assigned to start button (NOT CURRENTLY IN USE)
 #define mux0 2        //line sensor mux input 0
 #define mux1 4        //line sensor mux input 1
 #define mux2 7        //line sensor mux input 2
@@ -47,9 +47,9 @@ const bool enable_abort = true; //enables/disables movement aborts
 bool robot_detected = false;    //true if robot was detected
 
 volatile bool finished_search = false; //indicates when a search is finished
-bool start_dir = false;       // false: prioritize [left] over [right]. true: prioritize [right] over [left]
-//maze data
+bool start_dir = false;                // false: prioritize [left] over [right]. true: prioritize [right] over [left]
 
+//maze data
 const byte mazeSize = rowLength * colLength;
 
 //starting position
@@ -72,65 +72,59 @@ void setup()
   stopMovement();
   Serial.begin(9600);
   pinMode(buttonPin, INPUT);
-//  pinMode(rightWallSensor, INPUT);
-//  pinMode(frontWallSensor, INPUT);
-  //  pinMode(rightWallLED, OUTPUT);
-  //  pinMode(frontWallLED, OUTPUT);
   pinMode(mux0, OUTPUT);
   pinMode(mux1, OUTPUT);
   pinMode(mux2, OUTPUT);
   pinMode(fft_mux_pin, OUTPUT);
-  //Serial.println("Wait for button");
-
-  //uncomment for start button
-  //while(digitalRead(buttonPin)==LOW);
 
   //fpga setup:
-  if(treasure) {
-    if(debug) Serial.println("Setting up Camera...");
+  if (treasure)
+  {
+    if (debug)
+      Serial.println("Setting up Camera...");
     camera_setup();
-    setupComm();//serial comm setup
+    setupComm(); //serial comm setup
   }
 
   analogRead(1); //initialize analog
 
-  //Serial.println("B");
-  fft_setup(); //ADDED
+  fft_setup();
   if (debug)
     Serial.println("FFT");
 
   digitalWrite(fft_mux_pin, LOW);
 
-  //
-  if(!debug || debug_mode == 0) {
+  //wait for start signal
+  if (!debug || debug_mode == 0)
+  {
     while (has_started == false)
     {
       fft_analyze();
       //Serial.println("Waiting");
-    delay(5);
+      delay(5);
     }
   }
-  else {
+  else
+  {
     has_started == true;
   }
   digitalWrite(fft_mux_pin, HIGH);
-  fft_analyze(); //reset
+  fft_analyze(); //reset fft
 
   initMaze();
   printf_begin();
-  if(transmit) {
-    radioSetup();//????
+
+  //setup radio
+  if (transmit)
+  {
+    radioSetup();
   }
 
-  //stack setup
-  //initialize_search();
-  //append_frontier(getPosition(x, y));
-  //delay(10000);//delay start
-
-  //init start:
+  //init start position:
   updateMaze();
-  if(transmit) {
-    sendMaze(x,y);
+  if (transmit)
+  {
+    sendMaze(x, y);
   }
 }
 
@@ -146,11 +140,11 @@ void loop()
     else
     {
       //send the entire maze
-      if(transmit) {
+      if (transmit)
+      {
         sendFullMaze();
       }
-      resetSearch();//reset explored
-      //initMaze();//clear maze
+      resetSearch();          //reset explored
       start_dir = !start_dir; //switch to right-left search
       finished_search = false;
     }
@@ -158,12 +152,9 @@ void loop()
   //debug
   else
   {
-    //sensors
+    //test sensors
     if (debug_mode == 0)
     {
-      //forwardAndStop();
-      //backwardsAndStop();
-      //stopMovement();
       // troubleshooting code block:
       int leftmost = readLeftmostSensor();
       Serial.print("LL:");
@@ -234,20 +225,24 @@ void loop()
       Serial.print(y);
       Serial.println();
       orientation = (orientation == 0) ? 3 : orientation - 1;
-      if(treasure) { 
+      if (treasure)
+      {
         readShape();
       }
-      
+
       updateMaze();
-      if(transmit) {
+      if (transmit)
+      {
         sendMaze(x, y);
       }
       delay(1000);
     }
     //fpga/camera
-    else if(debug_mode == 2) {
+    else if (debug_mode == 2)
+    {
       delay(500);
-      if(treasure) {
+      if (treasure)
+      {
         readShape();
       }
       //Serial.print("Loop");
@@ -262,7 +257,7 @@ void loop()
  * At each square, this algorithm performs a search for the next closest frontier square that is accessible
  * from all visited squares. 
  * 
- * Once this square is found, it generates the path requiring the fewest movements (1 movement = move between squares or a turn)
+ * Once this square is found, it generates the path requiring the fewest movements (1 movement = move between squares)
  * through the explored squares and executes this path
  * 
  */
@@ -301,13 +296,10 @@ void updateCoor()
 //using three wall sensors
 void updateMaze()
 {
-  //  turnLeft();
-  //  finishTurn();
-  //  orientation = (orientation-1)%4;
   int hasFrontWall = readForwardWallSensor();
   int hasRightWall = readRightWallSensor();
   int hasLeftWall = readLeftWallSensor();
-  //  if(!isExplored(x,y)) {
+
   if (orientation == 0)
   {
     setNorthWall(x, y, hasFrontWall);
@@ -330,7 +322,6 @@ void updateMaze()
       setWestWall(x, y, 1); //robot starts with wall behind it
       left_start = true;
     }
-    //setWestWall(x,y,0);
   }
   else if (orientation == 2)
   {
@@ -349,7 +340,6 @@ void updateMaze()
     setWestWall(x, y, hasFrontWall);
     setNorthWall(x, y, hasRightWall);
     setSouthWall(x, y, hasLeftWall);
-    //setEastWall(x,y,0);
     if (!left_start && x == start_x && y == start_y)
     {
       setEastWall(x, y, 1); //robot starts with wall behind it
@@ -358,65 +348,10 @@ void updateMaze()
   }
   setExplored(x, y, 1);
 
-  if(treasure && hasRightWall && getShape(x,y) == 0) {
-    readShape();//analyze wall for treasure
+  if (treasure && hasRightWall && getShape(x, y) == 0)
+  {
+    readShape(); //analyze wall for treasure
   }
-  //  }
-  //checking wal data [TODO: return value indicating mismatched wall read]
-  //  else {
-  //    if (orientation == 0)
-  //    {
-  //      bool check = true;
-  //      if(hasFrontWall != getNorthWall(x,y)) {
-  //        setNorthWall(x, y, hasFrontWall);
-  //        check = false;
-  //      }
-  //      if(hasRightWall != getEastWall(x,y)) {
-  //        setEastWall(x,y,hasEastWall);
-  //        check = false;
-  //      }
-  //      setEastWall(x, y, hasRightWall);
-  //      setWestWall(x, y, hasLeftWall);
-  //      //robot starts with wall behind it
-  //      if (!left_start && x == start_x && y == start_y) {
-  //        setSouthWall(x, y, 1);
-  //        left_start = true;
-  //      }
-  //    }
-  //    else if (orientation == 1)
-  //    {
-  //      setEastWall(x, y, hasFrontWall);
-  //      setSouthWall(x, y, hasRightWall);
-  //      setNorthWall(x, y, hasLeftWall);
-  //      if (!left_start && x == start_x && y == start_y) {
-  //        setWestWall(x, y, 1); //robot starts with wall behind it
-  //        left_start = true;
-  //      }
-  //    //setWestWall(x,y,0);
-  //    }
-  //    else if (orientation == 2)
-  //    {
-  //      setSouthWall(x, y, hasFrontWall);
-  //      setWestWall(x, y, hasRightWall);
-  //      setEastWall(x, y, hasLeftWall);
-  //      //setNorthWall(x,y,0);
-  //      if (!left_start && x == start_x && y == start_y) {
-  //       setNorthWall(x, y, 1); //robot starts with wall behind it
-  //        left_start = true;
-  //      }
-  //    }
-  //    else
-  //    {
-  //      setWestWall(x, y, hasFrontWall);
-  //      setNorthWall(x, y, hasRightWall);
-  //      setSouthWall(x, y, hasLeftWall);
-  //      //setEastWall(x,y,0);
-  //      if (!left_start && x == start_x && y == start_y) {
-  //        setEastWall(x, y, 1); //robot starts with wall behind it
-  //        left_start = true;
-  //      }
-  //    }
-  //  }
 }
 
 /*
@@ -440,9 +375,11 @@ void sendFullMaze()
 }
 
 //make all coordinate unexplored:
-void resetSearch() {
-  for(int i = 0; i < mazeSize; i++) {
-    setExplored(getX(i), getY(i),0);
+void resetSearch()
+{
+  for (int i = 0; i < mazeSize; i++)
+  {
+    setExplored(getX(i), getY(i), 0);
   }
 }
 
@@ -478,4 +415,3 @@ void rightWallFollowing()
     updateCoor();
   }
 }
-

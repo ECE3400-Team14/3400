@@ -1,5 +1,5 @@
 /* Dijkstra's Algorithm:
- *  does dijkstra's algorithm
+ *  Does dijkstra's algorithm (inspired by Lecture 17, Slide 14, ECE 3400 2018)
  *  Written by: David Burgstahler (dfb93)
 */
 
@@ -9,7 +9,7 @@
 //Node data structure for storing search tree nodes
 struct Node
 {
-  byte position; //x,y coordinates of the node
+  byte position;       //x,y coordinates of the node
   byte move_and_or;    //[XXXMMMOO]
   struct Node *parent; //the parent of this node
   byte dist;           //distance from start to [position]
@@ -129,18 +129,6 @@ int compare(Node *&a, Node *&b)
     return 1;
 }
 
-//NEW: Push node based on distance to it. also updates visitedNodes?
-//void pushPriority(struct Node &v) {
-//  for (int i = 0; i < priorityQueue->size; i++) {
-//    struct Node v_i* = priorityQueue->get(i);
-//    //if distance to new node is less, add it in this place in the queue
-//    if(v->dist < v_i-> dist) {
-//      priorityQueue.set(i,v);
-//      break;//exit
-//    }
-//  }
-//}
-
 void initQueue()
 {
   priorityQueue = new LinkedList<Node *>;
@@ -152,14 +140,13 @@ void clearQueue()
   delete priorityQueue;
 }
 
-//storing visited nodes (TODO: Allocate Dynamically)
+//Allocating memory for storing visited nodes
 const int v_max_size = (rowLength)*colLength;
 struct Node visitedNodes[v_max_size]; //array for storing node data
 byte v_index = 0;                     //index where to enter new nodes
 
 /*
    Reset list of visited nodes by algorithm
-   TODO: Allocate memory dynamically?
 */
 void initVisitedNodes()
 {
@@ -173,7 +160,7 @@ void addVisitedNode(struct Node v)
 {
   if (v_index == v_max_size)
   {
-    //???? FAIL!
+    //FAIL!
   }
   else
   {
@@ -217,9 +204,8 @@ Node *getNodeByPos(byte pos)
   return NULL;
 }
 
-//find the closest frontier node to start_pos
-
 /*
+ * 
  * procedure dijkstra(G, v):
  *        let Q be a queue
  *        Q.push(v)
@@ -249,13 +235,11 @@ void dijkstra(int start_pos)
   setOrientation(&start, orientation);
   start.dist = 0;
   addVisitedNode(start);
-  //nodeQueue->push(getTopAddr());
   priorityQueue->add(getTopAddr()); //add to front of priority queue
 
   //search for the frontier
   while (priorityQueue->size() > 0)
   {
-    //struct Node* v = nodeQueue->pop();//get next node to look at
     priorityQueue->sort(compare);              //sort queue
     struct Node *v = priorityQueue->remove(0); //get the first element in queue (smallest distance)
 
@@ -273,11 +257,9 @@ void dijkstra(int start_pos)
       //if forward is an option
       if (canGoForward(getX(pos), getY(pos), getOrientation(v)))
       {
-        //Serial.println("CanGoForward");
         int next_orientation = getOrientation(v);
-        int next_pos = nextCoor(getX(pos), getY(pos), next_orientation); //coordinate of destination
-        //if(!visitedContains(next_pos)) {//if next coordinate is not visited
-        struct Node *check_v = getNodeByPos(next_pos); //see if node with next_pos already exists
+        int next_pos = nextCoor(getX(pos), getY(pos), next_orientation); //coordinate of destinatio
+        struct Node *check_v = getNodeByPos(next_pos);                   //see if node with next_pos already exists
         if (check_v == NULL)
         { //if next coordinate is not visited
           //add Node with next coordinate and 'f'
@@ -288,9 +270,7 @@ void dijkstra(int start_pos)
           next_v.parent = v;
           next_v.dist = v->dist + getDist(v, &next_v); //calc distance
           //put next_v in visited array
-          addVisitedNode(next_v); //store this node in memory
-          //TODO: Use Priority Queue
-          //nodeQueue->push(getTopAddr());//add address of node to queue
+          addVisitedNode(next_v);           //store this node in memory
           priorityQueue->add(getTopAddr()); //add new item to queue
         }
         else
@@ -315,24 +295,19 @@ void dijkstra(int start_pos)
             Serial.println("CanGoLeft");
           int next_orientation = (getOrientation(v) == 0) ? 3 : getOrientation(v) - 1; //orientation after turning left
           int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);             //coordinate of front destination
-          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
           struct Node *check_v = getNodeByPos(next_pos);
           if (check_v == NULL)
           { //if next coordinate is not visited
             //add Node with this coordinate and 'l'
             struct Node next_v;
-            //next_v.position = pos;//keep the same position
             next_v.position = next_pos; //the new position
-            //next_v.move = 'l';
-            setMove(&next_v, 'l'); //left to get to next position
+            setMove(&next_v, 'l');      //left to get to next position
             //next_v.orientation = next_orientation;
             setOrientation(&next_v, next_orientation);
             next_v.parent = v;
             next_v.dist = v->dist + getDist(v, &next_v); //calc distance
-            //nodeQueue->push(next_v);
-            addVisitedNode(next_v); //store this node in memory
-            //nodeQueue->push(getTopAddr());
-            priorityQueue->add(getTopAddr()); //add new item to queue
+            addVisitedNode(next_v);                      //store this node in memory
+            priorityQueue->add(getTopAddr());            //add new item to queue
           }
           else
           {                                               //next_pos has path already with check_v
@@ -351,11 +326,8 @@ void dijkstra(int start_pos)
         //if right is an option (turn right with not wall)
         if (canGoRight(getX(pos), getY(pos), getOrientation(v)))
         {
-          //Serial.println("CanGoRight");
-          //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
           int next_orientation = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
           int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);
-          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
           struct Node *check_v = getNodeByPos(next_pos);
           if (check_v == NULL)
           { //if next coordinate is not visited
@@ -363,18 +335,13 @@ void dijkstra(int start_pos)
             if (debug)
               Serial.println("new node");
             struct Node next_v;
-            //next_v.position = pos;//keep the same position
             next_v.position = next_pos; //new position
-            //next_v.move = 'r';
             setMove(&next_v, 'r');
-            //next_v.orientation = next_orientation;
             setOrientation(&next_v, next_orientation);
             next_v.parent = v;
             next_v.dist = v->dist + getDist(v, &next_v); //calc distance
-            //nodeQueue->push(next_v);
-            addVisitedNode(next_v); //store this node in memory
-            //nodeQueue->push(getTopAddr());
-            priorityQueue->add(getTopAddr()); //add new item to queue
+            addVisitedNode(next_v);                      //store this node in memory
+            priorityQueue->add(getTopAddr());            //add new item to queue
           }
           else
           {                                               //next_pos has path already with check_v
@@ -394,11 +361,8 @@ void dijkstra(int start_pos)
       { //right > left
         if (canGoRight(getX(pos), getY(pos), getOrientation(v)))
         {
-          //Serial.println("CanGoRight");
-          //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
           int next_orientation = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
           int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);
-          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
           struct Node *check_v = getNodeByPos(next_pos);
           if (check_v == NULL)
           { //if next coordinate is not visited
@@ -406,18 +370,13 @@ void dijkstra(int start_pos)
             if (debug)
               Serial.println("new node");
             struct Node next_v;
-            //next_v.position = pos;//keep the same position
             next_v.position = next_pos; //new position
-            //next_v.move = 'r';
             setMove(&next_v, 'r');
-            //next_v.orientation = next_orientation;
             setOrientation(&next_v, next_orientation);
             next_v.parent = v;
             next_v.dist = v->dist + getDist(v, &next_v); //calc distance
-            //nodeQueue->push(next_v);
-            addVisitedNode(next_v); //store this node in memory
-            //nodeQueue->push(getTopAddr());
-            priorityQueue->add(getTopAddr()); //add new item to queue
+            addVisitedNode(next_v);                      //store this node in memory
+            priorityQueue->add(getTopAddr());            //add new item to queue
           }
           else
           {                                               //next_pos has path already with check_v
@@ -438,24 +397,18 @@ void dijkstra(int start_pos)
             Serial.println("CanGoLeft");
           int next_orientation = (getOrientation(v) == 0) ? 3 : getOrientation(v) - 1; //orientation after turning left
           int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);             //coordinate of front destination
-          //if(!visitedContains(next_pos)) {//if next coordinate is not visited
           struct Node *check_v = getNodeByPos(next_pos);
           if (check_v == NULL)
           { //if next coordinate is not visited
             //add Node with this coordinate and 'l'
             struct Node next_v;
-            //next_v.position = pos;//keep the same position
             next_v.position = next_pos; //the new position
-            //next_v.move = 'l';
-            setMove(&next_v, 'l'); //left to get to next position
-            //next_v.orientation = next_orientation;
+            setMove(&next_v, 'l');      //left to get to next position]
             setOrientation(&next_v, next_orientation);
             next_v.parent = v;
             next_v.dist = v->dist + getDist(v, &next_v); //calc distance
-            //nodeQueue->push(next_v);
-            addVisitedNode(next_v); //store this node in memory
-            //nodeQueue->push(getTopAddr());
-            priorityQueue->add(getTopAddr()); //add new item to queue
+            addVisitedNode(next_v);                      //store this node in memory
+            priorityQueue->add(getTopAddr());            //add new item to queue
           }
           else
           {                                               //next_pos has path already with check_v
@@ -474,33 +427,20 @@ void dijkstra(int start_pos)
       //backwards
       if (canGoBackwards(getX(pos), getY(pos), getOrientation(v)))
       {
-        //Serial.println("CanGoBackwards");
-        //int next_orientation = (v->orientation == 3) ? 0 : v->orientation + 1;
         int next_orientation_r = (getOrientation(v) == 3) ? 0 : getOrientation(v) + 1;
         int next_orientation = (next_orientation_r == 3) ? 0 : next_orientation_r + 1;
         int next_pos = nextCoor(getX(pos), getY(pos), next_orientation);
-        //          Serial.println("Data:");
-        //          Serial.println(next_orientation);
-        //          Serial.println(next_pos);
-        //          Serial.println(!visitedContains(next_pos));
-        //if(!visitedContains(next_pos)) {//if next coordinate is not visited
         struct Node *check_v = getNodeByPos(next_pos);
         if (check_v == NULL)
         { //if next coordinate is not visited
           //add Node with this coordinate and 'r'
           struct Node next_v;
-          //next_v.position = pos;//keep the same position
           next_v.position = next_pos; //new position
-          //next_v.move = 'r';//made 'r' from 't' to preserve move priority heirarchy
-          //setMove(&next_v, 'r');
-          setMove(&next_v, 't'); //turn around
-          //next_v.orientation = next_orientation;
+          setMove(&next_v, 't');      //turn around
           setOrientation(&next_v, next_orientation);
           next_v.parent = v;
           next_v.dist = v->dist + getDist(v, &next_v); //calc distance
-          //nodeQueue->push(next_v);
-          addVisitedNode(next_v); //store this node in memory
-          //nodeQueue->push(getTopAddr());
+          addVisitedNode(next_v);                      //store this node in memory
           priorityQueue->add(getTopAddr());
         }
         else
@@ -531,13 +471,7 @@ void constructMovements(struct Node *v)
 {
   while (v != NULL)
   {
-    //char next_move = v->move;
     char next_move = getMove(v);
-    //    Serial.print(next_move); //debug
-    //    Serial.print(" to ");
-    //    Serial.print(getX(v->position));
-    //    Serial.print(",");
-    //    Serial.println(getY(v->position));
     movementStack.push(next_move);
     v = v->parent;
   }
