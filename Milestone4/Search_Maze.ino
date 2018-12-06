@@ -79,6 +79,11 @@ int performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
+    
+    if(treasure && !canGoRight(x,y,orientation) && getShape(x,y) == 0) {
+      readShape();//analyze wall for treasure
+    }
+    
     // if (enable_abort && checkForObstacle())
     //   return 0;
     if (forwardAndStop())
@@ -119,6 +124,11 @@ int performAction(char m)
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;
+
+    if(treasure && !canGoRight(x,y,orientation) && getShape(x,y) == 0) {
+      readShape();//analyze wall for treasure
+    }
+    
     turnLeft();
     finishTurn();
     orientation = (orientation == 0) ? 3 : orientation - 1;

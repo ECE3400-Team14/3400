@@ -3,7 +3,7 @@ const bool debug = false;
 const bool transmit = true;
 const bool treasure = true;
 
-const int debug_mode = 0;
+const int debug_mode = 2;
 /* 0: Line Sensors, Wall Sensors, Robot Detection
  * 1: Radio (transmit circle)
  * 2: Treasures (just read treasures)
